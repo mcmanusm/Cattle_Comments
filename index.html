@@ -31,28 +31,34 @@
             padding: 25px 12px;
         }
 
-        /* Power BI container */
+        /* FIX: Responsive Power BI embed */
         .powerbi-container {
             position: relative;
             width: 100%;
-            height: 950px; /* Desktop height */
             background: white;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+            /* DESKTOP aspect ratio (16:9 like first version) */
+            padding-top: 56.25%;
         }
 
-        /* Mobile: taller iframe */
+        /* MOBILE: make the frame taller */
         @media(max-width: 768px) {
             .powerbi-container {
-                height: 1300px;
+                padding-top: 95%;
             }
         }
 
-        iframe {
+        /* Iframe fills container area */
+        .powerbi-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            border: 0;
+            border: none;
         }
 
         /* Loading overlay */
@@ -129,7 +135,7 @@
         <iframe 
             id="pbiFrame"
             title="Cattle Weekly Metrics"
-            src="https://app.powerbi.com/view?r=eyJrIjoiNGVhOGM0NDgtYmFhOC00MzI0LTk5YzEtYTk5MjEzOWE3OTQ2IiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9&pageName=ReportSection&navContentPaneEnabled=false&zoomLevel=1"
+            src="https://app.powerbi.com/view?r=eyJrIjoiNGVhOGM0NDgtYmFhOC00MzI0LTk5YzEtYTk5MjEzOWE3OTQ2IiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9&navContentPaneEnabled=false&filterPaneEnabled=false&autoFit=true&displayMedium=fitToWidth"
             allowfullscreen>
         </iframe>
     </div>
@@ -144,11 +150,11 @@
 </div>
 
 <script>
-// Remove loading overlay once iframe loads
+// Remove loading overlay after iframe loads
 document.getElementById("pbiFrame").addEventListener("load", () => {
     setTimeout(() => {
         document.getElementById("loadingOverlay").style.display = "none";
-    }, 500);
+    }, 600);
 });
 
 // Fullscreen mode
@@ -157,7 +163,7 @@ function openFullScreen() {
     iframe.requestFullscreen?.() || iframe.webkitRequestFullscreen?.();
 }
 
-// Open in standalone Power BI window
+// Open in standalone Power BI viewer
 function openNewTab() {
     window.open(
         "https://app.powerbi.com/view?r=eyJrIjoiNGVhOGM0NDgtYmFhOC00MzI0LTk5YzEtYTk5MjEzOWE3OTQ2IiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9",
@@ -172,12 +178,12 @@ function refreshReport() {
     iframe.src = iframe.src;
 }
 
-// Share link
+// Share current page URL
 function shareReport() {
     if (navigator.share) {
         navigator.share({
-            title: "AuctionsPlus Cattle Metrics",
-            text: "Check out the dashboard",
+            title: "AuctionsPlus Cattle Metrics Dashboard",
+            text: "View this week's cattle market dashboard.",
             url: window.location.href
         });
     } else {

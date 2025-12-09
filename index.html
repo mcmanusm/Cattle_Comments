@@ -26,12 +26,19 @@
         }
 
         .wrapper {
-            max-width: 1200px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 25px 12px;
+            padding: 25px 20px;
         }
 
-        /* FIX: Responsive Power BI embed */
+        /* Optional: add max-width for very large screens */
+        @media(min-width: 1600px) {
+            .wrapper {
+                max-width: 1600px;
+            }
+        }
+
+        /* FIX: Responsive Power BI embed - MUCH TALLER for full page usage */
         .powerbi-container {
             position: relative;
             width: 100%;
@@ -40,14 +47,16 @@
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 
-            /* DESKTOP aspect ratio (16:9 like first version) */
-            padding-top: 56.25%;
+            /* DESKTOP: Much taller aspect ratio to use full page */
+            min-height: 800px;
+            height: calc(100vh - 200px);
         }
 
-        /* MOBILE: make the frame taller */
+        /* MOBILE: adjust height for mobile screens */
         @media(max-width: 768px) {
             .powerbi-container {
-                padding-top: 95%;
+                min-height: 600px;
+                height: calc(100vh - 180px);
             }
         }
 

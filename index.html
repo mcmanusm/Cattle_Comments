@@ -17,9 +17,9 @@
         header {
             background: #003d5c;
             color: white;
-            padding: 16px;
+            padding: 12px;
             text-align: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
             letter-spacing: 0.5px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
@@ -28,7 +28,7 @@
         .wrapper {
             max-width: 100%;
             margin: 0 auto;
-            padding: 25px 20px;
+            padding: 15px 20px;
         }
 
         /* Optional: add max-width for very large screens */
@@ -38,7 +38,7 @@
             }
         }
 
-        /* FIX: Responsive Power BI embed - Optimized height for HubSpot */
+        /* FIX: Responsive Power BI embed - Compressed for HubSpot */
         .powerbi-container {
             position: relative;
             width: 100%;
@@ -47,14 +47,14 @@
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 
-            /* DESKTOP: Fixed height that shows content + buttons */
-            height: 650px;
+            /* DESKTOP: Compressed height to fit everything on screen */
+            height: 500px;
         }
 
         /* MOBILE: adjust height for mobile screens */
         @media(max-width: 768px) {
             .powerbi-container {
-                height: 500px;
+                height: 450px;
             }
         }
 
@@ -89,7 +89,7 @@
             gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-top: 18px;
+            margin-top: 12px;
         }
 
         .btn {

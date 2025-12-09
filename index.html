@@ -38,7 +38,7 @@
             }
         }
 
-        /* FIX: Responsive Power BI embed - MUCH TALLER for full page usage */
+        /* FIX: Responsive Power BI embed - Optimized height for HubSpot */
         .powerbi-container {
             position: relative;
             width: 100%;
@@ -47,16 +47,14 @@
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 
-            /* DESKTOP: Much taller aspect ratio to use full page */
-            min-height: 800px;
-            height: calc(100vh - 200px);
+            /* DESKTOP: Fixed height that shows content + buttons */
+            height: 650px;
         }
 
         /* MOBILE: adjust height for mobile screens */
         @media(max-width: 768px) {
             .powerbi-container {
-                min-height: 600px;
-                height: calc(100vh - 180px);
+                height: 500px;
             }
         }
 

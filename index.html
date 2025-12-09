@@ -9,8 +9,9 @@
         body {
             margin: 0;
             padding: 0;
-            background: #eef1f4;
+            background: #f4f6f8;
             font-family: Arial, sans-serif;
+            color: #003d5c;
         }
 
         header {
@@ -19,52 +20,47 @@
             padding: 16px;
             text-align: center;
             font-size: 22px;
-            font-weight: bold;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
-        .powerbi-wrapper {
+        .wrapper {
             max-width: 1200px;
-            margin: 30px auto;
-            padding: 10px;
+            margin: 0 auto;
+            padding: 25px 12px;
         }
 
         .powerbi-container {
             position: relative;
             width: 100%;
-            height: 0;
-            padding-bottom: 56.25%;
             background: white;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         iframe {
+            width: 100%;
+            border: 0;
+        }
+
+        .loading-overlay {
             position: absolute;
             top: 0; left: 0;
             width: 100%;
             height: 100%;
-            border: 0;
-        }
-
-        /* Loading overlay */
-        .loading-overlay {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(255,255,255,0.85);
+            background: rgba(255,255,255,0.9);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
-            font-weight: bold;
-            z-index: 10;
+            font-size: 18px;
+            font-weight: 600;
             color: #003d5c;
+            z-index: 10;
         }
 
-        /* Button bar */
-        .powerbi-actions {
+        .actions {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
@@ -72,7 +68,7 @@
             margin-top: 18px;
         }
 
-        .powerbi-btn {
+        .btn {
             padding: 12px 20px;
             background: #003d5c;
             color: white;
@@ -81,33 +77,29 @@
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.25s;
         }
 
-        .powerbi-btn:hover {
+        .btn:hover {
             background: #005580;
         }
 
-        .powerbi-btn.secondary {
+        .btn.secondary {
             background: white;
             color: #003d5c;
             border: 2px solid #003d5c;
         }
 
-        .powerbi-btn.secondary:hover {
-            background: #f5f5f5;
+        .btn.secondary:hover {
+            background: #f0f0f0;
         }
 
-        /* Mobile optimisation */
         @media (max-width: 768px) {
-            .powerbi-container {
-                padding-bottom: 80%;
-            }
             header {
                 font-size: 18px;
                 padding: 12px;
             }
-            .powerbi-btn {
+            .btn {
                 width: 100%;
             }
         }
@@ -116,14 +108,12 @@
 
 <body>
 
-<header>
-    AuctionsPlus – Cattle Weekly Metrics Dashboard
-</header>
+<header>AuctionsPlus – Cattle Weekly Metrics Dashboard</header>
 
-<div class="powerbi-wrapper">
+<div class="wrapper">
 
-    <div class="powerbi-container">
-        <div class="loading-overlay" id="loadingOverlay">Loading report…</div>
+    <div class="powerbi-container" id="pbiContainer">
+        <div class="loading-overlay" id="loadingOverlay">Loading dashboard…</div>
 
         <iframe 
             id="pbiFrame"
@@ -133,32 +123,47 @@
         </iframe>
     </div>
 
-    <div class="powerbi-actions">
-        <button class="powerbi-btn" onclick="openFullScreen()">📊 Fullscreen</button>
-        <button class="powerbi-btn secondary" onclick="openNewTab()">🔗 Open in New Tab</button>
-        <button class="powerbi-btn secondary" onclick="refreshReport()">🔄 Refresh</button>
-        <button class="powerbi-btn secondary" onclick="shareReport()">📤 Share</button>
+    <div class="actions">
+        <button class="btn" onclick="openFullScreen()">📊 Fullscreen</button>
+        <button class="btn secondary" onclick="openNewTab()">🔗 Open in New Tab</button>
+        <button class="btn secondary" onclick="refreshReport()">🔄 Refresh</button>
+        <button class="btn secondary" onclick="shareReport()">📤 Share</button>
     </div>
 
 </div>
 
 <script>
-// Remove loading overlay after the Power BI report loads
+// Remove loading overlay shortly after content loads
 document.getElementById("pbiFrame").addEventListener("load", () => {
     setTimeout(() => {
         document.getElementById("loadingOverlay").style.display = "none";
-    }, 700);
+    }, 500);
+
+    // AUTO-HEIGHT RESIZE (Feature A)
+    resizeIframeToContent();
 });
 
-// Fullscreen function
-function openFullScreen() {
+// Auto-height function using postMessage from Power BI
+function resizeIframeToContent() {
     const iframe = document.getElementById("pbiFrame");
-    if (iframe.requestFullscreen) iframe.requestFullscreen();
-    else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
-    else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
+
+    window.addEventListener("message", (event) => {
+        if (event.data && event.data.height) {
+            iframe.style.height = event.data.height + "px";
+        }
+    });
+
+    // Request resize from Power BI
+    iframe.contentWindow.postMessage({action: "getHeight"}, "*");
 }
 
-// Open report in new tab
+// Fullscreen viewer
+function openFullScreen() {
+    const iframe = document.getElementById("pbiFrame");
+    iframe.requestFullscreen?.() || iframe.webkitRequestFullscreen?.();
+}
+
+// Open standalone
 function openNewTab() {
     window.open(
         "https://app.powerbi.com/view?r=eyJrIjoiNGVhOGM0NDgtYmFhOC00MzI0LTk5YzEtYTk5MjEzOWE3OTQ2IiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9",
@@ -166,7 +171,7 @@ function openNewTab() {
     );
 }
 
-// Refresh the iframe
+// Refresh dashboard
 function refreshReport() {
     const iframe = document.getElementById("pbiFrame");
     document.getElementById("loadingOverlay").style.display = "flex";
@@ -177,13 +182,13 @@ function refreshReport() {
 function shareReport() {
     if (navigator.share) {
         navigator.share({
-            title: "AuctionsPlus Cattle Weekly Metrics",
-            text: "Weekly market dashboard",
+            title: "AuctionsPlus Cattle Metrics",
+            text: "Check out the dashboard",
             url: window.location.href
         });
     } else {
         navigator.clipboard.writeText(window.location.href);
-        alert("🔗 Link copied to clipboard");
+        alert("Link copied to clipboard");
     }
 }
 </script>

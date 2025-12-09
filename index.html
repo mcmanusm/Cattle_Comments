@@ -48,26 +48,14 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 
             /* DESKTOP: Smaller height to fit everything on screen */
-            height: 200px;
+            height: 400px;
         }
 
         /* MOBILE: adjust height for mobile screens */
         @media(max-width: 768px) {
             .powerbi-container {
-                height: 180px;
+                height: 350px;
             }
-        }
-
-        /* Iframe fills container area with zoom effect */
-        .powerbi-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 111.11%; /* Compensate for 90% zoom */
-            height: 111.11%;
-            border: none;
-            transform: scale(0.9);
-            transform-origin: 0 0;
         }
 
         /* Iframe fills container area */

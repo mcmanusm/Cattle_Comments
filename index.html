@@ -14,31 +14,24 @@
             color: #003d5c;
         }
 
+        /* REMOVED: Header is now hidden for cleaner iframe embed */
         header {
-            background: #003d5c;
-            color: white;
-            padding: 16px;
-            text-align: center;
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            display: none;
         }
 
         .wrapper {
             max-width: 100%;
             margin: 0 auto;
-            padding: 25px 20px;
+            padding: 20px;
         }
 
-        /* Optional: add max-width for very large screens */
         @media(min-width: 1600px) {
             .wrapper {
                 max-width: 1600px;
             }
         }
 
-        /* FIX: Responsive Power BI embed - Optimized height for HubSpot */
+        /* Responsive Power BI embed - Fixed height to show content + buttons */
         .powerbi-container {
             position: relative;
             width: 100%;
@@ -46,19 +39,16 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-
-            /* DESKTOP: Fixed height that shows content + buttons */
-            height: 400px;
+            /* Adjusted height to accommodate dashboard + buttons below */
+            height: 520px;
         }
 
-        /* MOBILE: adjust height for mobile screens */
         @media(max-width: 768px) {
             .powerbi-container {
-                height: 400px;
+                height: 450px;
             }
         }
 
-        /* Iframe fills container area */
         .powerbi-container iframe {
             position: absolute;
             top: 0;
@@ -68,7 +58,6 @@
             border: none;
         }
 
-        /* Loading overlay */
         .loading-overlay {
             position: absolute;
             top: 0; left: 0;
@@ -90,6 +79,7 @@
             flex-wrap: wrap;
             justify-content: center;
             margin-top: 18px;
+            padding-bottom: 20px;
         }
 
         .btn {
@@ -119,20 +109,17 @@
         }
 
         @media (max-width: 768px) {
-            header {
-                font-size: 18px;
-                padding: 12px;
-            }
             .btn {
                 width: 100%;
+            }
+            .wrapper {
+                padding: 10px;
             }
         }
     </style>
 </head>
 
 <body>
-
-<header>AuctionsPlus – Cattle Weekly Metrics Dashboard</header>
 
 <div class="wrapper">
 

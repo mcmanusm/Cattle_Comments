@@ -133,9 +133,8 @@
 
     <div class="actions">
         <button class="btn" onclick="openFullScreen()">📊 Fullscreen</button>
-        <button class="btn secondary" onclick="openNewTab()">🔗 Open in New Tab</button>
+        <button class="btn secondary" onclick="openGithubPage()">🔗 View Full Dashboard</button>
         <button class="btn secondary" onclick="refreshReport()">🔄 Refresh</button>
-        <button class="btn secondary" onclick="shareReport()">📤 Share</button>
     </div>
 
 </div>
@@ -154,10 +153,10 @@ function openFullScreen() {
     iframe.requestFullscreen?.() || iframe.webkitRequestFullscreen?.();
 }
 
-// Open in standalone Power BI viewer
-function openNewTab() {
+// Open GitHub page in new tab
+function openGithubPage() {
     window.open(
-        "https://app.powerbi.com/view?r=eyJrIjoiNGVhOGM0NDgtYmFhOC00MzI0LTk5YzEtYTk5MjEzOWE3OTQ2IiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9",
+        "https://mcmanusm.github.io/Cattle_Comments/",
         "_blank"
     );
 }
@@ -167,20 +166,6 @@ function refreshReport() {
     const iframe = document.getElementById("pbiFrame");
     document.getElementById("loadingOverlay").style.display = "flex";
     iframe.src = iframe.src;
-}
-
-// Share current page URL
-function shareReport() {
-    if (navigator.share) {
-        navigator.share({
-            title: "AuctionsPlus Cattle Metrics Dashboard",
-            text: "View this week's cattle market dashboard.",
-            url: window.location.href
-        });
-    } else {
-        navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard");
-    }
 }
 </script>
 

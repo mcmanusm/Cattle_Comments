@@ -19,7 +19,7 @@ const puppeteer = require('puppeteer');
     const frame = await frameHandle.contentFrame();
 
     // Wait for Power BI visuals to render
-    await frame.waitForTimeout(6000);
+    await new Promise(r => setTimeout(r, 6000));
 
     const allText = await frame.evaluate(() => document.body.innerText);
 

@@ -22,6 +22,9 @@ const puppeteer = require('puppeteer');
     await new Promise(r => setTimeout(r, 6000));
 
     const allText = await frame.evaluate(() => document.body.innerText);
+    console.log("=== DEBUG START ===");
+    console.log(allText);
+    console.log("=== DEBUG END ===");
 
     function extract(pattern) {
         const match = allText.match(pattern);

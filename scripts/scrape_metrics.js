@@ -33,14 +33,24 @@ const puppeteer = require('puppeteer');
     console.log(allText);
     console.log("=== DEBUG END ===");
 
-    // ---- Regex extract function (will update later) ----
+    // ---- Regex extract function (placeholder for now) ----
     function extract(pattern) {
         const match = allText.match(pattern);
         return match ? match[1].trim() : null;
     }
 
-    // ---- Metrics object (currently will all be null) ----
+    // ---- Metrics object (will update once we know A11Y structure) ----
     const metrics = {
         total_head: extract(/Commercial Cattle Offerings\s*([\d,]+)/i),
         amount_over_reserve: extract(/Amount Over Reserve \(VOR\)\s*\$?([\d,]+)/i),
-        clearance_rate: extract_
+        clearance_rate: extract(/Clearance Rate \(\%\)\s*([\d,]+)\s*%/i),
+        ayci_dw: extract(/AYCI c\/kg DW\s*([\d,]+)/i)
+    };
+
+    console.log("Scraped metrics:", metrics);
+
+    // ---- Save JSON ----
+    fs.writeFileSync("metrics.json", JSON.stringify(metrics, null, 2));
+
+    await browser.close();
+})();

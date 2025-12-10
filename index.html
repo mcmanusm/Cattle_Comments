@@ -14,15 +14,10 @@
             color: #003d5c;
         }
 
-        /* REMOVED: Header is now hidden for cleaner iframe embed */
-        header {
-            display: none;
-        }
-
         .wrapper {
             max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px 15px 10px 15px;
         }
 
         @media(min-width: 1600px) {
@@ -31,7 +26,7 @@
             }
         }
 
-        /* Responsive Power BI embed - Fixed height to show content + buttons */
+        /* Compact Power BI embed - reduced height */
         .powerbi-container {
             position: relative;
             width: 100%;
@@ -39,13 +34,13 @@
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            /* Adjusted height to accommodate dashboard + buttons below */
-            height: 520px;
+            /* Reduced height to minimize white space */
+            height: 480px;
         }
 
         @media(max-width: 768px) {
             .powerbi-container {
-                height: 450px;
+                height: 420px;
             }
         }
 
@@ -78,8 +73,8 @@
             gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-top: 18px;
-            padding-bottom: 20px;
+            margin-top: 15px;
+            padding-bottom: 15px;
         }
 
         .btn {
@@ -111,6 +106,8 @@
         @media (max-width: 768px) {
             .btn {
                 width: 100%;
+                padding: 10px 16px;
+                font-size: 14px;
             }
             .wrapper {
                 padding: 10px;

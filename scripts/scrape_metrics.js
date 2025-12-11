@@ -1,56 +1,89 @@
-const fs = require('fs');
-const puppeteer = require('puppeteer');
+const fs = require("fs");
+const puppeteer = require("puppeteer");
 
 (async () => {
-    const url = "https://mcmanusm.github.io/Cattle_Comments/";
+  const url = "https://mcmanusm.github.io/Cattle_Comments/";
 
-    const browser = await puppeteer.launch({
-        headless: "new",
-        args: ["--no-sandbox", "--disable-setuid-sandbox"]
-    });
+  const browser = await puppeteer.launch({
+    headless: "new",
+    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+  });
 
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: "networkidle2" });
+  const page = await browser.newPage();
+  await page.goto(url, { waitUntil: "networkidle2" });
 
-    // Wait for iframe
-    await page.waitForSelector("#pbiFrame");
+  // Wait for iframe
+  await page.waitForSelector("#pbiFrame");
+  const frameHandle = await page.$("#pbiFrame");
+  const frame = await frameHandle.contentFrame();
 
-    const frameHandle = await page.$("#pbiFrame");
-    const frame = await frameHandle.contentFrame();
+  // Let visuals load
+  await new Promise(r => setTimeout(r, 6000));
 
-    // ---- NEW: Dump accessibility tree ----
-    const accTree = await frame.accessibility.snapshot();
-    console.log("=== A11Y START ===");
-    console.log(JSON.stringify(accTree, null, 2));
-    console.log("=== A11Y END ===");
+  // helper to extract a text value from a visual group
+  async function getMetric(viewLabel, metricLabel) {
+    return await frame.evaluate((viewLabel, metricLabel) => {
+      const groups = [...document.querySelectorAll(".visual-title")];
+      const viewGroup = groups.find(g => g.textContent.includes(viewLabel));
+      if (!viewGroup) return null;
 
-    // ---- Wait for Power BI visuals to render ----
-    await new Promise(r => setTimeout(r, 6000));
+      const parent = viewGroup.closest(".visual-container-body");
+      if (!parent) return null;
 
-    // ---- Dump all visible text (debugging) ----
-    const allText = await frame.evaluate(() => document.body.innerText);
-    console.log("=== DEBUG START ===");
-    console.log(allText);
-    console.log("=== DEBUG END ===");
+      const metricElement = [...parent.querySelectorAll("*")].find(el =>
+        el.innerText && el.innerText.includes(metricLabel)
+      );
 
-    // ---- Regex extract function (placeholder for now) ----
-    function extract(pattern) {
-        const match = allText.match(pattern);
-        return match ? match[1].trim() : null;
+      if (!metricElement) return null;
+
+      // Extract number
+      const cleaned = metricElement.innerText.replace(/[^0-9.-]/g, "");
+      return Number(cleaned);
+    }, viewLabel, metricLabel);
+  }
+
+  // Views
+  const VIEWS = {
+    this_week: "This Week",
+    last_week: "Last Week",
+    two_weeks_ago: "2 Weeks Ago",
+    three_weeks_ago: "3 Weeks Ago"
+  };
+
+  // Metrics to extract
+  const METRICS = {
+    total_head: "Total Head Incl Reoffers",
+    clearance_rate: "Clearance Rate",
+    vor: "Amount Over Reserve",
+    ayci: "AYCI c/kg DW",
+    // Change metrics (only in this week view)
+    total_head_change: "Total Head Change Index",
+    clearance_change: "Clearance Change Index",
+    vor_change: "Amount Over Reserve Change Index",
+    ayci_change: "AYCI Change Index"
+  };
+
+  const result = {
+    this_week: {},
+    last_week: {},
+    two_weeks_ago: {},
+    three_weeks_ago: {}
+  };
+
+  // ─── EXTRACT METRICS FOR EACH VIEW ───────────────────────────
+  for (const [viewKey, viewLabel] of Object.entries(VIEWS)) {
+    for (const [metricKey, metricLabel] of Object.entries(METRICS)) {
+
+      // Only this_week has change metrics
+      if (metricKey.includes("change") && viewKey !== "this_week") continue;
+
+      const value = await getMetric(viewLabel, metricLabel);
+      result[viewKey][metricKey] = value ?? null;
     }
+  }
 
-    // ---- Metrics object (will update once we know A11Y structure) ----
-    const metrics = {
-        total_head: extract(/Commercial Cattle Offerings\s*([\d,]+)/i),
-        amount_over_reserve: extract(/Amount Over Reserve \(VOR\)\s*\$?([\d,]+)/i),
-        clearance_rate: extract(/Clearance Rate \(\%\)\s*([\d,]+)\s*%/i),
-        ayci_dw: extract(/AYCI c\/kg DW\s*([\d,]+)/i)
-    };
+  // Save JSON
+  fs.writeFileSync("metrics.json", JSON.stringify(result, null, 2));
 
-    console.log("Scraped metrics:", metrics);
-
-    // ---- Save JSON ----
-    fs.writeFileSync("metrics.json", JSON.stringify(metrics, null, 2));
-
-    await browser.close();
+  await browser.close();
 })();

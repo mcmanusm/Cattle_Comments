@@ -1,62 +1,95 @@
-const axios = require("axios");
-const cheerio = require("cheerio");
-const fs = require("fs");
+const fs = require('fs');
+const puppeteer = require('puppeteer');
 
-// URL of your Power BI iframe
-const IFRAME_URL = "https://app.powerbi.com/view?r=XXXXXX"; // <-- your iframe URL here
+(async () => {
+    const url = "https://mcmanusm.github.io/Cattle_Comments/";
 
-async function run() {
-    try {
-        const { data: html } = await axios.get(IFRAME_URL);
-        const $ = cheerio.load(html);
+    const browser = await puppeteer.launch({
+        headless: "new",
+        args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    });
 
-        // Helper: get metric value by matching label text
-        function getMetric(labelText) {
-            const label = $(`h4[data-sub-selection-object-name*="${labelText}"]`);
-            if (!label.length) return null;
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "networkidle2" });
 
-            const valueElem = label.parent().find("p");
-            if (!valueElem.length) return null;
+    // Wait for Power BI iframe
+    await page.waitForSelector("#pbiFrame");
+    const frameHandle = await page.$("#pbiFrame");
+    const frame = await frameHandle.contentFrame();
 
-            return valueElem.text().trim();
+    // Wait for Power BI to finish rendering
+    await new Promise(r => setTimeout(r, 6000));
+
+    // Extract accessibility tree
+    const accTree = await frame.accessibility.snapshot();
+
+    // Flatten A11Y tree to a simple text array
+    function walk(node, list = []) {
+        if (!node) return list;
+        if (node.name) list.push(node.name.trim());
+        if (node.children) {
+            for (const child of node.children) walk(child, list);
         }
-
-        // Extract values from each week's tile group
-        const metrics = {
-            this_week: {
-                total_head: getMetric("Total Head"),
-                clearance_rate: getMetric("Clearance Rate"),
-                vor: getMetric("Amount over Reserve"),
-                ayci: getMetric("AYCI")
-            },
-            last_week: {
-                total_head: getMetric("Total Head", 1),
-                clearance_rate: getMetric("Clearance Rate", 1),
-                vor: getMetric("Amount over Reserve", 1),
-                ayci: getMetric("AYCI", 1)
-            },
-            two_weeks_ago: {
-                total_head: getMetric("Total Head", 2),
-                clearance_rate: getMetric("Clearance Rate", 2),
-                vor: getMetric("Amount over Reserve", 2),
-                ayci: getMetric("AYCI", 2)
-            },
-            three_weeks_ago: {
-                total_head: getMetric("Total Head", 3),
-                clearance_rate: getMetric("Clearance Rate", 3),
-                vor: getMetric("Amount over Reserve", 3),
-                ayci: getMetric("AYCI", 3)
-            }
-        };
-
-        // Write JSON file
-        fs.writeFileSync("metrics.json", JSON.stringify(metrics, null, 2));
-        console.log("Updated metrics.json:\n", metrics);
-
-    } catch (err) {
-        console.error("Scrape error:", err);
-        process.exit(1);
+        return list;
     }
-}
 
-run();
+    const flat = walk(accTree);
+
+    // Helper – find label, then value that comes right after it
+    function findValue(label, weekIndex) {
+        // Find label in flattened list (partial match allowed)
+        const idx = flat.findIndex(t => t.toLowerCase().includes(label.toLowerCase()));
+        if (idx === -1) return null;
+
+        // Each week block appears in sequence, so:
+        // Week 0 = index
+        // Week 1 = index + 2
+        // Week 2 = index + 4
+        // Week 3 = index + 6
+        const valueIndex = idx + 1 + (weekIndex * 2);
+        const raw = flat[valueIndex];
+        if (!raw) return null;
+
+        return raw;
+    }
+
+    // Clean numeric values
+    function clean(val) {
+        if (!val) return null;
+        return val.replace(/[^\d.-]/g, "");
+    }
+
+    const metrics = {
+        this_week: {
+            total_head: clean(findValue("Total Head Incl Reoffers", 0)),
+            clearance_rate: clean(findValue("Clearance Rate", 0)),
+            vor: clean(findValue("Amount Over Reserve", 0)),
+            ayci: clean(findValue("AYCI", 0)),
+        },
+        last_week: {
+            total_head: clean(findValue("Total Head Incl Reoffers", 1)),
+            clearance_rate: clean(findValue("Clearance Rate", 1)),
+            vor: clean(findValue("Amount Over Reserve", 1)),
+            ayci: clean(findValue("AYCI", 1)),
+        },
+        two_weeks_ago: {
+            total_head: clean(findValue("Total Head Incl Reoffers", 2)),
+            clearance_rate: clean(findValue("Clearance Rate", 2)),
+            vor: clean(findValue("Amount Over Reserve", 2)),
+            ayci: clean(findValue("AYCI", 2)),
+        },
+        three_weeks_ago: {
+            total_head: clean(findValue("Total Head Incl Reoffers", 3)),
+            clearance_rate: clean(findValue("Clearance Rate", 3)),
+            vor: clean(findValue("Amount Over Reserve", 3)),
+            ayci: clean(findValue("AYCI", 3)),
+        }
+    };
+
+    console.log("SCRAPED METRICS:", metrics);
+
+    // Save JSON file
+    fs.writeFileSync("metrics.json", JSON.stringify(metrics, null, 2));
+
+    await browser.close();
+})();

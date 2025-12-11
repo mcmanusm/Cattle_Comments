@@ -1,6 +1,30 @@
 {
-  "total_head": "18,266",
-  "amount_over_reserve": "108",
-  "clearance_rate": "71",
-  "ayci_dw": "988"
+  "this_week": {
+    "total_head": null,
+    "clearance_rate": null,
+    "vor": null,
+    "ayci": null,
+    "total_head_change": null,
+    "clearance_change": null,
+    "vor_change": null,
+    "ayci_change": null
+  },
+  "last_week": {
+    "total_head": null,
+    "clearance_rate": null,
+    "vor": null,
+    "ayci": null
+  },
+  "two_weeks_ago": {
+    "total_head": null,
+    "clearance_rate": null,
+    "vor": null,
+    "ayci": null
+  },
+  "three_weeks_ago": {
+    "total_head": null,
+    "clearance_rate": null,
+    "vor": null,
+    "ayci": null
+  }
 }

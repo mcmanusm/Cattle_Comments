@@ -1,89 +1,62 @@
+const axios = require("axios");
+const cheerio = require("cheerio");
 const fs = require("fs");
-const puppeteer = require("puppeteer");
 
-(async () => {
-  const url = "https://mcmanusm.github.io/Cattle_Comments/";
+// URL of your Power BI iframe
+const IFRAME_URL = "https://app.powerbi.com/view?r=XXXXXX"; // <-- your iframe URL here
 
-  const browser = await puppeteer.launch({
-    headless: "new",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"]
-  });
+async function run() {
+    try {
+        const { data: html } = await axios.get(IFRAME_URL);
+        const $ = cheerio.load(html);
 
-  const page = await browser.newPage();
-  await page.goto(url, { waitUntil: "networkidle2" });
+        // Helper: get metric value by matching label text
+        function getMetric(labelText) {
+            const label = $(`h4[data-sub-selection-object-name*="${labelText}"]`);
+            if (!label.length) return null;
 
-  // Wait for iframe
-  await page.waitForSelector("#pbiFrame");
-  const frameHandle = await page.$("#pbiFrame");
-  const frame = await frameHandle.contentFrame();
+            const valueElem = label.parent().find("p");
+            if (!valueElem.length) return null;
 
-  // Let visuals load
-  await new Promise(r => setTimeout(r, 6000));
+            return valueElem.text().trim();
+        }
 
-  // helper to extract a text value from a visual group
-  async function getMetric(viewLabel, metricLabel) {
-    return await frame.evaluate((viewLabel, metricLabel) => {
-      const groups = [...document.querySelectorAll(".visual-title")];
-      const viewGroup = groups.find(g => g.textContent.includes(viewLabel));
-      if (!viewGroup) return null;
+        // Extract values from each week's tile group
+        const metrics = {
+            this_week: {
+                total_head: getMetric("Total Head"),
+                clearance_rate: getMetric("Clearance Rate"),
+                vor: getMetric("Amount over Reserve"),
+                ayci: getMetric("AYCI")
+            },
+            last_week: {
+                total_head: getMetric("Total Head", 1),
+                clearance_rate: getMetric("Clearance Rate", 1),
+                vor: getMetric("Amount over Reserve", 1),
+                ayci: getMetric("AYCI", 1)
+            },
+            two_weeks_ago: {
+                total_head: getMetric("Total Head", 2),
+                clearance_rate: getMetric("Clearance Rate", 2),
+                vor: getMetric("Amount over Reserve", 2),
+                ayci: getMetric("AYCI", 2)
+            },
+            three_weeks_ago: {
+                total_head: getMetric("Total Head", 3),
+                clearance_rate: getMetric("Clearance Rate", 3),
+                vor: getMetric("Amount over Reserve", 3),
+                ayci: getMetric("AYCI", 3)
+            }
+        };
 
-      const parent = viewGroup.closest(".visual-container-body");
-      if (!parent) return null;
+        // Write JSON file
+        fs.writeFileSync("metrics.json", JSON.stringify(metrics, null, 2));
+        console.log("Updated metrics.json:\n", metrics);
 
-      const metricElement = [...parent.querySelectorAll("*")].find(el =>
-        el.innerText && el.innerText.includes(metricLabel)
-      );
-
-      if (!metricElement) return null;
-
-      // Extract number
-      const cleaned = metricElement.innerText.replace(/[^0-9.-]/g, "");
-      return Number(cleaned);
-    }, viewLabel, metricLabel);
-  }
-
-  // Views
-  const VIEWS = {
-    this_week: "This Week",
-    last_week: "Last Week",
-    two_weeks_ago: "2 Weeks Ago",
-    three_weeks_ago: "3 Weeks Ago"
-  };
-
-  // Metrics to extract
-  const METRICS = {
-    total_head: "Total Head Incl Reoffers",
-    clearance_rate: "Clearance Rate",
-    vor: "Amount Over Reserve",
-    ayci: "AYCI c/kg DW",
-    // Change metrics (only in this week view)
-    total_head_change: "Total Head Change Index",
-    clearance_change: "Clearance Change Index",
-    vor_change: "Amount Over Reserve Change Index",
-    ayci_change: "AYCI Change Index"
-  };
-
-  const result = {
-    this_week: {},
-    last_week: {},
-    two_weeks_ago: {},
-    three_weeks_ago: {}
-  };
-
-  // ─── EXTRACT METRICS FOR EACH VIEW ───────────────────────────
-  for (const [viewKey, viewLabel] of Object.entries(VIEWS)) {
-    for (const [metricKey, metricLabel] of Object.entries(METRICS)) {
-
-      // Only this_week has change metrics
-      if (metricKey.includes("change") && viewKey !== "this_week") continue;
-
-      const value = await getMetric(viewLabel, metricLabel);
-      result[viewKey][metricKey] = value ?? null;
+    } catch (err) {
+        console.error("Scrape error:", err);
+        process.exit(1);
     }
-  }
+}
 
-  // Save JSON
-  fs.writeFileSync("metrics.json", JSON.stringify(result, null, 2));
-
-  await browser.close();
-})();
+run();

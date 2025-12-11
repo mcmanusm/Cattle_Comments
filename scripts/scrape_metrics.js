@@ -1,8 +1,7 @@
-const fs = require("fs");
-const puppeteer = require("puppeteer");
+const fs = require('fs');
+const puppeteer = require('puppeteer');
 
 (async () => {
-
     const url = "https://mcmanusm.github.io/Cattle_Comments/table.html";
 
     const browser = await puppeteer.launch({
@@ -13,26 +12,32 @@ const puppeteer = require("puppeteer");
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "networkidle2" });
 
-    // Wait for Power BI iframe
-    await page.waitForSelector("#pbiTable");
+    // Wait for iframe to appear
+    await page.waitForSelector("iframe");
 
-    const frameHandle = await page.$("#pbiTable");
+    const frameHandle = await page.$("iframe");
     const frame = await frameHandle.contentFrame();
 
-    // Wait for table cells
-    await frame.waitForSelector('div[role="gridcell"]');
+    // Give Power BI extra time to fully render the table
+    await new Promise(r => setTimeout(r, 8000));
 
-    // Extract full table
+    // Extract ALL text from inside iframe (debug purposes)
+    const allText = await frame.evaluate(() => document.body.innerText);
+    console.log("=== DEBUG TEXT START ===");
+    console.log(allText);
+    console.log("=== DEBUG TEXT END ===");
+
+    // Extract table data
     const rows = await frame.evaluate(() => {
         const cells = Array.from(document.querySelectorAll('div[role="gridcell"]'));
 
-        const map = {};
+        if (!cells.length) return null;
 
+        const map = {};
         cells.forEach(cell => {
             const row = parseInt(cell.getAttribute("row-index"));
             const col = parseInt(cell.getAttribute("column-index"));
             const text = cell.innerText.trim();
-
             if (!map[row]) map[row] = {};
             map[row][col] = text;
         });
@@ -40,10 +45,22 @@ const puppeteer = require("puppeteer");
         return map;
     });
 
-    // Helper to clean numeric strings
-    const clean = v => v.replace(/[$,%c]/g, "");
+    if (!rows || !rows[1]) {
+        throw new Error("❌ ERROR: Power BI table did NOT load any gridcell elements.");
+    }
 
-    // Build JSON using real column indexes
+    // Clean function to standardise values
+    function clean(v) {
+        if (!v) return null;
+        return v.replace(/[^\d\-.,]/g, "").trim();
+    }
+
+    // Build metrics JSON using row indexes:
+    // Row 1 = This Week
+    // Row 2 = Last Week
+    // Row 3 = Two Weeks Ago
+    // Row 4 = Three Weeks Ago
+
     const metrics = {
         this_week: {
             total_head: clean(rows[1][1]),
@@ -73,6 +90,7 @@ const puppeteer = require("puppeteer");
 
     console.log("SCRAPED METRICS:", metrics);
 
+    // Save JSON to file
     fs.writeFileSync("metrics.json", JSON.stringify(metrics, null, 2));
 
     await browser.close();

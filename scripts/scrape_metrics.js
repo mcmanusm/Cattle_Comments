@@ -2,7 +2,8 @@ const fs = require("fs");
 const puppeteer = require("puppeteer");
 
 (async () => {
-    const url = "https://mcmanusm.github.io/Cattle_Comments/";
+
+    const url = "https://mcmanusm.github.io/Cattle_Comments/table.html";
 
     const browser = await puppeteer.launch({
         headless: "new",
@@ -12,69 +13,67 @@ const puppeteer = require("puppeteer");
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "networkidle2" });
 
-    await page.waitForSelector("#pbiFrame");
-    const frameHandle = await page.$("#pbiFrame");
+    // Wait for Power BI iframe
+    await page.waitForSelector("#pbiTable");
+
+    const frameHandle = await page.$("#pbiTable");
     const frame = await frameHandle.contentFrame();
 
-    // Helper to wait for Power BI visuals to render
-    async function waitRender() {
-        await new Promise(r => setTimeout(r, 6000));
-    }
+    // Wait for table cells
+    await frame.waitForSelector('div[role="gridcell"]');
 
-    // Extract helper (your EXACT working regex system)
-    function extract(text, pattern) {
-        const match = text.match(pattern);
-        return match ? match[1].trim() : null;
-    }
+    // Extract full table
+    const rows = await frame.evaluate(() => {
+        const cells = Array.from(document.querySelectorAll('div[role="gridcell"]'));
 
-    // Extract all metrics using your verified regex patterns
-    function extractMetrics(text) {
-        return {
-            total_head: extract(text, /Commercial Cattle Offerings\s*([\d,]+)/i),
-            amount_over_reserve: extract(text, /Amount Over Reserve \(VOR\)\s*\$?([\d,]+)/i),
-            clearance_rate: extract(text, /Clearance Rate \(\%\)\s*([\d,]+)\s*%/i),
-            ayci_dw: extract(text, /AYCI c\/kg DW\s*([\d,]+)/i)
-        };
-    }
+        const map = {};
 
-    // Click a tab by visible name
-    async function clickTab(label) {
-        await frame.evaluate((tabName) => {
-            const buttons = [...document.querySelectorAll("*")];
-            const el = buttons.find(x => x.innerText && x.innerText.trim() === tabName);
-            if (el) el.click();
-        }, label);
+        cells.forEach(cell => {
+            const row = parseInt(cell.getAttribute("row-index"));
+            const col = parseInt(cell.getAttribute("column-index"));
+            const text = cell.innerText.trim();
 
-        await waitRender();
-    }
+            if (!map[row]) map[row] = {};
+            map[row][col] = text;
+        });
 
-    // SCRAPE ALL 4 WEEKS
-    const results = {};
+        return map;
+    });
 
-    // THIS WEEK
-    await clickTab("This Week");
-    let textTW = await frame.evaluate(() => document.body.innerText);
-    results.this_week = extractMetrics(textTW);
+    // Helper to clean numeric strings
+    const clean = v => v.replace(/[$,%c]/g, "");
 
-    // LAST WEEK
-    await clickTab("Last Week");
-    let textLW = await frame.evaluate(() => document.body.innerText);
-    results.last_week = extractMetrics(textLW);
+    // Build JSON using real column indexes
+    const metrics = {
+        this_week: {
+            total_head: clean(rows[1][1]),
+            clearance_rate: clean(rows[1][2]),
+            amount_over_reserve: clean(rows[1][3]),
+            ayci_dw: clean(rows[1][4])
+        },
+        last_week: {
+            total_head: clean(rows[2][1]),
+            clearance_rate: clean(rows[2][2]),
+            amount_over_reserve: clean(rows[2][3]),
+            ayci_dw: clean(rows[2][4])
+        },
+        two_weeks_ago: {
+            total_head: clean(rows[3][1]),
+            clearance_rate: clean(rows[3][2]),
+            amount_over_reserve: clean(rows[3][3]),
+            ayci_dw: clean(rows[3][4])
+        },
+        three_weeks_ago: {
+            total_head: clean(rows[4][1]),
+            clearance_rate: clean(rows[4][2]),
+            amount_over_reserve: clean(rows[4][3]),
+            ayci_dw: clean(rows[4][4])
+        }
+    };
 
-    // 2 WEEKS AGO
-    await clickTab("2 Weeks Ago");
-    let text2W = await frame.evaluate(() => document.body.innerText);
-    results.two_weeks_ago = extractMetrics(text2W);
+    console.log("SCRAPED METRICS:", metrics);
 
-    // 3 WEEKS AGO
-    await clickTab("3 Weeks Ago");
-    let text3W = await frame.evaluate(() => document.body.innerText);
-    results.three_weeks_ago = extractMetrics(text3W);
-
-    console.log("SCRAPED METRICS:");
-    console.log(results);
-
-    fs.writeFileSync("metrics.json", JSON.stringify(results, null, 2));
+    fs.writeFileSync("metrics.json", JSON.stringify(metrics, null, 2));
 
     await browser.close();
 })();

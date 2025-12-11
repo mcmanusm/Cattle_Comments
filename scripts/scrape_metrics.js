@@ -1,5 +1,5 @@
-const fs = require('fs');
-const puppeteer = require('puppeteer');
+const fs = require("fs");
+const puppeteer = require("puppeteer");
 
 (async () => {
     const url = "https://mcmanusm.github.io/Cattle_Comments/";
@@ -12,47 +12,69 @@ const puppeteer = require('puppeteer');
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "networkidle2" });
 
-    // Wait for iframe
     await page.waitForSelector("#pbiFrame");
-
     const frameHandle = await page.$("#pbiFrame");
     const frame = await frameHandle.contentFrame();
 
-    // ---- A11Y DUMP ----
-    const accTree = await frame.accessibility.snapshot();
-    console.log("=== A11Y START ===");
-    console.log(JSON.stringify(accTree, null, 2));
-    console.log("=== A11Y END ===");
+    // Helper to wait for Power BI visuals to render
+    async function waitRender() {
+        await new Promise(r => setTimeout(r, 6000));
+    }
 
-    // ---- Wait for PB visuals ----
-    await new Promise(r => setTimeout(r, 6000));
-
-    // ---- Extract all text ----
-    const allText = await frame.evaluate(() => document.body.innerText);
-    console.log("=== DEBUG START ===");
-    console.log(allText);
-    console.log("=== DEBUG END ===");
-
-    // ---- Extract helper ----
-    function extract(pattern) {
-        const match = allText.match(pattern);
+    // Extract helper (your EXACT working regex system)
+    function extract(text, pattern) {
+        const match = text.match(pattern);
         return match ? match[1].trim() : null;
     }
 
-    // ---- UPDATED REGEX FOR NEW LABELS ----
-    const metrics = {
-        total_head: extract(/Total Head Incl Reoffers\s*([\d,]+)/i),
+    // Extract all metrics using your verified regex patterns
+    function extractMetrics(text) {
+        return {
+            total_head: extract(text, /Commercial Cattle Offerings\s*([\d,]+)/i),
+            amount_over_reserve: extract(text, /Amount Over Reserve \(VOR\)\s*\$?([\d,]+)/i),
+            clearance_rate: extract(text, /Clearance Rate \(\%\)\s*([\d,]+)\s*%/i),
+            ayci_dw: extract(text, /AYCI c\/kg DW\s*([\d,]+)/i)
+        };
+    }
 
-        amount_over_reserve: extract(/Amount Over Reserve\s*\$?([\d,]+)/i),
+    // Click a tab by visible name
+    async function clickTab(label) {
+        await frame.evaluate((tabName) => {
+            const buttons = [...document.querySelectorAll("*")];
+            const el = buttons.find(x => x.innerText && x.innerText.trim() === tabName);
+            if (el) el.click();
+        }, label);
 
-        clearance_rate: extract(/Clearance Rate\s*\(%?\)\s*([\d,]+)/i),
+        await waitRender();
+    }
 
-        ayci_dw: extract(/AYCI c\/kg DW\s*([\d,]+)/i)
-    };
+    // SCRAPE ALL 4 WEEKS
+    const results = {};
 
-    console.log("Scraped metrics:", metrics);
+    // THIS WEEK
+    await clickTab("This Week");
+    let textTW = await frame.evaluate(() => document.body.innerText);
+    results.this_week = extractMetrics(textTW);
 
-    fs.writeFileSync("metrics.json", JSON.stringify(metrics, null, 2));
+    // LAST WEEK
+    await clickTab("Last Week");
+    let textLW = await frame.evaluate(() => document.body.innerText);
+    results.last_week = extractMetrics(textLW);
+
+    // 2 WEEKS AGO
+    await clickTab("2 Weeks Ago");
+    let text2W = await frame.evaluate(() => document.body.innerText);
+    results.two_weeks_ago = extractMetrics(text2W);
+
+    // 3 WEEKS AGO
+    await clickTab("3 Weeks Ago");
+    let text3W = await frame.evaluate(() => document.body.innerText);
+    results.three_weeks_ago = extractMetrics(text3W);
+
+    console.log("SCRAPED METRICS:");
+    console.log(results);
+
+    fs.writeFileSync("metrics.json", JSON.stringify(results, null, 2));
 
     await browser.close();
 })();

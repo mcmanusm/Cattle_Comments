@@ -12,43 +12,53 @@ const puppeteer = require('puppeteer');
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "networkidle2" });
 
-    await page.waitForSelector("iframe");
+    // Wait for iframe
+    await page.waitForSelector("#pbiTable");
 
-    const frameHandle = await page.$("iframe");
+    const frameHandle = await page.$("#pbiTable");
     const frame = await frameHandle.contentFrame();
 
-    // Give Power BI more time
-    await new Promise(r => setTimeout(r, 8000));
+    // Wait for Power BI to render
+    await new Promise(r => setTimeout(r, 6000));
 
+    // Dump all text
     const allText = await frame.evaluate(() => document.body.innerText);
-
-    console.log("=== DEBUG TEXT START ===");
+    console.log("=== DEBUG START ===");
     console.log(allText);
-    console.log("=== DEBUG TEXT END ===");
+    console.log("=== DEBUG END ===");
 
-    // Clean helper
-    const clean = v =>
-        v ? v.replace(/[^\d\-.,]/g, "").trim() : null;
+    // Helper to clean numeric values
+    const clean = (v) => v.replace(/[\$,c%p ]+/g, "").trim();
 
-    // Extract table rows using regex
-    const rowRegex = /(\d[\d,]*)\s*\n(\d+%)\s*\n\$(\d+)\s*\n([\d,]+)\s*\n/g;
+    // ROW CAPTURE REGEX
+    // Captures:
+    // index, total head, clearance %, VOR, AYCI, ayci change,
+    // total head change, clearance change, vor change
+    const rowRegex = /Select Row\s*(\d+)\s*([\d,]+)\s*([\d.]+%)\s*\$?(-?[\d,]+)\s*([\d,]+)\s*(-?[\d]+c)\s*(-?[\d.]+%)\s*(-?[\d]+pp)\s*\$?(-?[\d,]+)/g;
 
     const rows = [];
     let match;
-
     while ((match = rowRegex.exec(allText)) !== null) {
         rows.push({
-            total_head: clean(match[1]),
-            clearance_rate: clean(match[2]),
-            amount_over_reserve: clean(match[3]),
-            ayci_dw: clean(match[4])
+            index: match[1],
+            total_head: clean(match[2]),
+            clearance_rate: clean(match[3]),
+            amount_over_reserve: clean(match[4]),
+            ayci_dw: clean(match[5]),
+            ayci_change: clean(match[6]),
+            total_head_change: clean(match[7]),
+            clearance_rate_change: clean(match[8]),
+            vor_change: clean(match[9])
         });
     }
 
-    if (rows.length < 4) {
-        throw new Error("❌ Could not extract all 4 table rows from text.");
+    if (rows.length !== 4) {
+        console.error("❌ ERROR: Expected 4 rows but found:", rows.length);
+        console.error(rows);
+        process.exit(1);
     }
 
+    // Map rows to week labels
     const metrics = {
         this_week: rows[0],
         last_week: rows[1],
@@ -56,8 +66,9 @@ const puppeteer = require('puppeteer');
         three_weeks_ago: rows[3]
     };
 
-    console.log("SCRAPED METRICS:", metrics);
+    console.log("Scraped Metrics:", metrics);
 
+    // Save JSON
     fs.writeFileSync("metrics.json", JSON.stringify(metrics, null, 2));
 
     await browser.close();

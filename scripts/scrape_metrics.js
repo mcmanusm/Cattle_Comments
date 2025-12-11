@@ -18,38 +18,40 @@ const puppeteer = require('puppeteer');
     const frameHandle = await page.$("#pbiFrame");
     const frame = await frameHandle.contentFrame();
 
-    // ---- NEW: Dump accessibility tree ----
+    // ---- A11Y DUMP ----
     const accTree = await frame.accessibility.snapshot();
     console.log("=== A11Y START ===");
     console.log(JSON.stringify(accTree, null, 2));
     console.log("=== A11Y END ===");
 
-    // ---- Wait for Power BI visuals to render ----
+    // ---- Wait for PB visuals ----
     await new Promise(r => setTimeout(r, 6000));
 
-    // ---- Dump all visible text (debugging) ----
+    // ---- Extract all text ----
     const allText = await frame.evaluate(() => document.body.innerText);
     console.log("=== DEBUG START ===");
     console.log(allText);
     console.log("=== DEBUG END ===");
 
-    // ---- Regex extract function (placeholder for now) ----
+    // ---- Extract helper ----
     function extract(pattern) {
         const match = allText.match(pattern);
         return match ? match[1].trim() : null;
     }
 
-    // ---- Metrics object (will update once we know A11Y structure) ----
+    // ---- UPDATED REGEX FOR NEW LABELS ----
     const metrics = {
-        total_head: extract(/Commercial Cattle Offerings\s*([\d,]+)/i),
-        amount_over_reserve: extract(/Amount Over Reserve \(VOR\)\s*\$?([\d,]+)/i),
-        clearance_rate: extract(/Clearance Rate \(\%\)\s*([\d,]+)\s*%/i),
+        total_head: extract(/Total Head Incl Reoffers\s*([\d,]+)/i),
+
+        amount_over_reserve: extract(/Amount Over Reserve\s*\$?([\d,]+)/i),
+
+        clearance_rate: extract(/Clearance Rate\s*\(%?\)\s*([\d,]+)/i),
+
         ayci_dw: extract(/AYCI c\/kg DW\s*([\d,]+)/i)
     };
 
     console.log("Scraped metrics:", metrics);
 
-    // ---- Save JSON ----
     fs.writeFileSync("metrics.json", JSON.stringify(metrics, null, 2));
 
     await browser.close();

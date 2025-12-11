@@ -1,26 +1,6 @@
 {
-  "this_week": {
-    "total_head": null,
-    "clearance_rate": null,
-    "vor": null,
-    "ayci": null
-  },
-  "last_week": {
-    "total_head": null,
-    "clearance_rate": null,
-    "vor": null,
-    "ayci": null
-  },
-  "two_weeks_ago": {
-    "total_head": null,
-    "clearance_rate": null,
-    "vor": null,
-    "ayci": null
-  },
-  "three_weeks_ago": {
-    "total_head": null,
-    "clearance_rate": null,
-    "vor": null,
-    "ayci": null
-  }
+  "total_head": null,
+  "amount_over_reserve": null,
+  "clearance_rate": null,
+  "ayci_dw": null
 }

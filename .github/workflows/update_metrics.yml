@@ -44,10 +44,19 @@ jobs:
             esac
           fi
 
+          # --------------------------------------------------------
+          # MANUAL RUN OVERRIDE
+          # --------------------------------------------------------
+          # If the workflow was triggered manually, always run
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "Manual run detected – forcing scrape"
+            SHOULD_RUN=true
+          fi
+
           echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
 
       # ------------------------------------------------------------
-      # RUN SCRAPER (ONLY IF TIME MATCHES)
+      # RUN SCRAPER (ONLY IF TIME MATCHES OR MANUAL RUN)
       # ------------------------------------------------------------
       - name: Run scraper
         if: steps.timecheck.outputs.should_run == 'true'

@@ -6,6 +6,7 @@
     <title>AuctionsPlus – Cattle Weekly Metrics Dashboard</title>
 
     <style>
+        /* Base */
         body {
             margin: 0;
             padding: 0;
@@ -17,58 +18,66 @@
         .wrapper {
             max-width: 100%;
             margin: 0 auto;
-            padding: 8px 10px 3px 10px;
+            padding: 8px 10px 4px 10px;
         }
 
-        @media(min-width: 1600px) {
+        @media (min-width: 1600px) {
             .wrapper {
                 max-width: 1600px;
             }
         }
 
-        /* Compact Power BI embed - minimized height */
-    .powerbi-container {
-        position: relative;
-        width: 100%;
-        background: white;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        height: 520px; /* desktop default */
-    }
-    
-    /* Mobile: go TALL, not short */
-    @media (max-width: 768px) {
+        /* Power BI container */
         .powerbi-container {
-            height: 820px;
-            border-radius: 12px;
+            position: relative;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            height: 520px; /* desktop default */
         }
-    }
+
+        /* Mobile: go tall so cards feel like the app */
+        @media (max-width: 768px) {
+            body {
+                background: #ffffff;
+            }
+
+            .wrapper {
+                padding: 0;
+            }
+
+            .powerbi-container {
+                height: 820px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
 
         .powerbi-container iframe {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             border: none;
         }
 
+        /* Loading overlay */
         .loading-overlay {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background: rgba(255,255,255,0.9);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #003d5c;
             z-index: 10;
         }
 
+        /* Actions */
         .actions {
             display: flex;
             gap: 10px;
@@ -81,13 +90,13 @@
         .btn {
             padding: 9px 16px;
             background: #003d5c;
-            color: white;
+            color: #ffffff;
             border: none;
             border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.25s;
+            transition: background 0.25s;
         }
 
         .btn:hover {
@@ -95,7 +104,7 @@
         }
 
         .btn.secondary {
-            background: white;
+            background: #ffffff;
             color: #003d5c;
             border: 2px solid #003d5c;
         }
@@ -104,14 +113,10 @@
             background: #f0f0f0;
         }
 
+        /* Hide actions on mobile for app-like feel */
         @media (max-width: 768px) {
-            .btn {
-                width: 100%;
-                padding: 10px 16px;
-                font-size: 14px;
-            }
-            .wrapper {
-                padding: 10px;
+            .actions {
+                display: none;
             }
         }
     </style>
@@ -121,13 +126,14 @@
 
 <div class="wrapper">
 
-    <div class="powerbi-container" id="pbiContainer">
-        <div class="loading-overlay" id="loadingOverlay">Loading dashboard…</div>
+    <div class="powerbi-container">
+        <div class="loading-overlay" id="loadingOverlay">
+            Loading dashboard…
+        </div>
 
-        <iframe 
+        <iframe
             id="pbiFrame"
             title="Cattle Weekly Metrics"
-            src="https://app.powerbi.com/view?r=eyJrIjoiNGVhOGM0NDgtYmFhOC00MzI0LTk5YzEtYTk5MjEzOWE3OTQ2IiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9&navContentPaneEnabled=false&filterPaneEnabled=false&autoFit=true&displayMedium=fitToWidth"
             allowfullscreen>
         </iframe>
     </div>
@@ -141,33 +147,48 @@
 </div>
 
 <script>
-// Remove loading overlay after iframe loads
-document.getElementById("pbiFrame").addEventListener("load", () => {
-    setTimeout(() => {
-        document.getElementById("loadingOverlay").style.display = "none";
-    }, 600);
-});
-
-// Fullscreen mode
-function openFullScreen() {
     const iframe = document.getElementById("pbiFrame");
-    iframe.requestFullscreen?.() || iframe.webkitRequestFullscreen?.();
-}
+    const loadingOverlay = document.getElementById("loadingOverlay");
 
-// Open GitHub page in new tab
-function openGithubPage() {
-    window.open(
-        "https://mcmanusm.github.io/Cattle_Comments/",
-        "_blank"
-    );
-}
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
-// Refresh dashboard
-function refreshReport() {
-    const iframe = document.getElementById("pbiFrame");
-    document.getElementById("loadingOverlay").style.display = "flex";
-    iframe.src = iframe.src;
-}
+    const baseUrl = "https://app.powerbi.com/view?r=eyJrIjoiNGVhOGM0NDgtYmFhOC00MzI0LTk5YzEtYTk5MjEzOWE3OTQ2IiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9";
+
+    const mobileSrc =
+        baseUrl +
+        "&navContentPaneEnabled=false" +
+        "&filterPaneEnabled=false" +
+        "&displayMedium=fitToPage";
+
+    const desktopSrc =
+        baseUrl +
+        "&navContentPaneEnabled=false" +
+        "&filterPaneEnabled=false" +
+        "&displayMedium=fitToWidth";
+
+    iframe.src = isMobile ? mobileSrc : desktopSrc;
+
+    iframe.addEventListener("load", () => {
+        setTimeout(() => {
+            loadingOverlay.style.display = "none";
+        }, 600);
+    });
+
+    function openFullScreen() {
+        iframe.requestFullscreen?.() || iframe.webkitRequestFullscreen?.();
+    }
+
+    function openGithubPage() {
+        window.open(
+            "https://mcmanusm.github.io/Cattle_Comments/",
+            "_blank"
+        );
+    }
+
+    function refreshReport() {
+        loadingOverlay.style.display = "flex";
+        iframe.src = iframe.src;
+    }
 </script>
 
 </body>

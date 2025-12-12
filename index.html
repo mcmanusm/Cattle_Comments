@@ -1,46 +1,81 @@
-
-
 <!DOCTYPE html>
+<!--
+  index.html
+  ===========
+  Purpose:
+  This file is the FRONT-END (presentation layer) for the Cattle Weekly Metrics Dashboard.
+  It embeds a Power BI report, makes it responsive (desktop vs mobile),
+  and adds basic user actions like fullscreen and refresh.
+-->
+
 <html lang="en">
 <head>
+    <!-- Tell the browser we are using UTF-8 characters (standard, safe default) -->
     <meta charset="UTF-8" />
+
+    <!--
+      Viewport meta tag
+      - Critical for mobile devices
+      - Makes the page scale correctly on phones and tablets
+    -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Text shown in the browser tab -->
     <title>AuctionsPlus – Cattle Weekly Metrics Dashboard</title>
 
     <style>
-        /* Base */
+        /* =====================================================
+           BASE PAGE STYLES
+           These apply to the whole page unless overridden
+           ===================================================== */
         body {
-            margin: 0;
+            margin: 0;              /* Remove browser default spacing */
             padding: 0;
-            background: #f4f6f8;
+            background: #f4f6f8;    /* Light grey background */
             font-family: Arial, sans-serif;
-            color: #003d5c;
+            color: #003d5c;         /* AuctionsPlus blue */
         }
 
+        /*
+          Wrapper
+          - Centers content
+          - Adds consistent padding
+        */
         .wrapper {
             max-width: 100%;
-            margin: 0 auto;
+            margin: 0 auto;         /* Center horizontally */
             padding: 8px 10px 4px 10px;
         }
 
+        /*
+          Large desktop screens
+          - Prevents content becoming too wide on very large monitors
+        */
         @media (min-width: 1600px) {
             .wrapper {
                 max-width: 1600px;
             }
         }
 
-        /* Power BI container */
+        /* =====================================================
+           POWER BI CONTAINER
+           This is the "card" that holds the iframe
+           ===================================================== */
         .powerbi-container {
-            position: relative;
+            position: relative;     /* Allows absolute-positioned children */
             width: 100%;
             background: #ffffff;
-            border-radius: 10px;
-            overflow: hidden;
+            border-radius: 10px;    /* Rounded corners (desktop only) */
+            overflow: hidden;       /* Prevent iframe overflow */
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            height: 520px; /* desktop default */
+            height: 520px;           /* Default desktop height */
         }
 
-        /* Mobile: go tall so cards feel like the app */
+        /*
+          MOBILE STYLES
+          - Make dashboard taller
+          - Remove card look for app-like feel
+        */
         @media (max-width: 768px) {
             body {
                 background: #ffffff;
@@ -57,29 +92,38 @@
             }
         }
 
+        /*
+          IFRAME STYLING
+          - Make the embedded Power BI report fill the container
+        */
         .powerbi-container iframe {
             position: absolute;
-            inset: 0;
+            inset: 0;               /* Top, right, bottom, left = 0 */
             width: 100%;
             height: 100%;
             border: none;
         }
 
-        /* Loading overlay */
+        /* =====================================================
+           LOADING OVERLAY
+           Shown while Power BI report loads
+           ===================================================== */
         .loading-overlay {
             position: absolute;
             inset: 0;
             background: rgba(255,255,255,0.9);
-            display: flex;
+            display: flex;          /* Flexbox for centering text */
             justify-content: center;
             align-items: center;
             font-size: 16px;
             font-weight: 600;
             color: #003d5c;
-            z-index: 10;
+            z-index: 10;             /* Sit above iframe */
         }
 
-        /* Actions */
+        /* =====================================================
+           ACTION BUTTONS (DESKTOP ONLY)
+           ===================================================== */
         .actions {
             display: flex;
             gap: 10px;
@@ -89,6 +133,7 @@
             padding-bottom: 8px;
         }
 
+        /* Primary button styling */
         .btn {
             padding: 9px 16px;
             background: #003d5c;
@@ -98,13 +143,14 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.25s;
+            transition: background 0.25s; /* Smooth hover effect */
         }
 
         .btn:hover {
             background: #005580;
         }
 
+        /* Secondary button variant */
         .btn.secondary {
             background: #ffffff;
             color: #003d5c;
@@ -115,7 +161,11 @@
             background: #f0f0f0;
         }
 
-        /* Hide actions on mobile for app-like feel */
+        /*
+          Hide buttons on mobile
+          - Keeps interface clean
+          - Mimics native Power BI app
+        */
         @media (max-width: 768px) {
             .actions {
                 display: none;
@@ -126,13 +176,21 @@
 
 <body>
 
+<!-- =========================================================
+     PAGE CONTENT
+     ========================================================= -->
+
 <div class="wrapper">
 
+    <!-- Power BI dashboard container -->
     <div class="powerbi-container">
+
+        <!-- Loading overlay (visible until iframe loads) -->
         <div class="loading-overlay" id="loadingOverlay">
             Loading dashboard…
         </div>
 
+        <!-- Power BI iframe (src set via JavaScript) -->
         <iframe
             id="pbiFrame"
             title="Cattle Weekly Metrics"
@@ -140,46 +198,74 @@
         </iframe>
     </div>
 
+    <!-- Desktop-only action buttons -->
     <div class="actions">
+        <!-- Opens the iframe in fullscreen mode -->
         <button class="btn" onclick="openFullScreen()">📊 Fullscreen</button>
+
+        <!-- Opens the GitHub Pages site in a new tab -->
         <button class="btn secondary" onclick="openGithubPage()">🔗 View Full Dashboard</button>
+
+        <!-- Forces a reload of the Power BI report -->
         <button class="btn secondary" onclick="refreshReport()">🔄 Refresh</button>
     </div>
 
 </div>
 
+<!-- =========================================================
+     JAVASCRIPT
+     Controls behaviour and interactivity
+     ========================================================= -->
+
 <script>
+    /* Get references to important DOM elements */
     const iframe = document.getElementById("pbiFrame");
     const loadingOverlay = document.getElementById("loadingOverlay");
 
+    /* Detect whether the user is on a mobile-sized screen */
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
+    /*
+      Base Power BI embed URL
+      - This is the published Power BI report
+      - Query parameters are added below for layout control
+    */
     const baseUrl = "https://app.powerbi.com/view?r=eyJrIjoiNGVhOGM0NDgtYmFhOC00MzI0LTk5YzEtYTk5MjEzOWE3OTQ2IiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9";
 
+    /* Mobile-optimised Power BI settings */
     const mobileSrc =
         baseUrl +
         "&navContentPaneEnabled=false" +
         "&filterPaneEnabled=false" +
         "&displayMedium=fitToPage";
 
+    /* Desktop-optimised Power BI settings */
     const desktopSrc =
         baseUrl +
         "&navContentPaneEnabled=false" +
         "&filterPaneEnabled=false" +
         "&displayMedium=fitToWidth";
 
+    /* Choose which URL to load based on screen size */
     iframe.src = isMobile ? mobileSrc : desktopSrc;
 
+    /*
+      When the iframe finishes loading:
+      - Wait briefly
+      - Hide the loading overlay
+    */
     iframe.addEventListener("load", () => {
         setTimeout(() => {
             loadingOverlay.style.display = "none";
         }, 600);
     });
 
+    /* Request fullscreen mode for the iframe (browser dependent) */
     function openFullScreen() {
         iframe.requestFullscreen?.() || iframe.webkitRequestFullscreen?.();
     }
 
+    /* Open the GitHub Pages dashboard in a new tab */
     function openGithubPage() {
         window.open(
             "https://mcmanusm.github.io/Cattle_Comments/",
@@ -187,9 +273,10 @@
         );
     }
 
+    /* Reload the Power BI report */
     function refreshReport() {
-        loadingOverlay.style.display = "flex";
-        iframe.src = iframe.src;
+        loadingOverlay.style.display = "flex"; // Show loading overlay again
+        iframe.src = iframe.src;                // Force iframe reload
     }
 </script>
 

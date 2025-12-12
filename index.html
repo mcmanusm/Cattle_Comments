@@ -1,137 +1,196 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AuctionsPlus – Cattle Weekly Metrics</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AuctionsPlus – Cattle Weekly Metrics Dashboard</title>
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #f4f6f8;
-      font-family: Arial, sans-serif;
-    }
+    <style>
+        /* Base */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f6f8;
+            font-family: Arial, sans-serif;
+            color: #003d5c;
+        }
 
-    .wrapper {
-      max-width: 100%;
-      margin: 0 auto;
-      padding: 8px 10px;
-    }
+        .wrapper {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 8px 10px 4px 10px;
+        }
 
-    .powerbi-container {
-      position: relative;
-      width: 100%;
-      background: #ffffff;
-      border-radius: 10px;
-      overflow: hidden;
-      height: 520px; /* desktop */
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+        @media (min-width: 1600px) {
+            .wrapper {
+                max-width: 1600px;
+            }
+        }
 
-    @media (max-width: 768px) {
-      body {
-        background: #ffffff;
-      }
+        /* Power BI container */
+        .powerbi-container {
+            position: relative;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            height: 520px; /* desktop default */
+        }
 
-      .wrapper {
-        padding: 0;
-      }
+        /* Mobile: go tall so cards feel like the app */
+        @media (max-width: 768px) {
+            body {
+                background: #ffffff;
+            }
 
-      .powerbi-container {
-        height: 900px; /* mobile */
-        border-radius: 0;
-        box-shadow: none;
-      }
-    }
+            .wrapper {
+                padding: 0;
+            }
 
-    iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+            .powerbi-container {
+                height: 820px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
 
-    .loading-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      z-index: 10;
-    }
+        .powerbi-container iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
 
-    .actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 10px;
-    }
+        /* Loading overlay */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #003d5c;
+            z-index: 10;
+        }
 
-    @media (max-width: 768px) {
-      .actions {
-        display: none;
-      }
-    }
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+            padding-bottom: 8px;
+        }
 
-    .btn {
-      padding: 9px 16px;
-      background: #003d5c;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-  </style>
+        .btn {
+            padding: 9px 16px;
+            background: #003d5c;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.25s;
+        }
+
+        .btn:hover {
+            background: #005580;
+        }
+
+        .btn.secondary {
+            background: #ffffff;
+            color: #003d5c;
+            border: 2px solid #003d5c;
+        }
+
+        .btn.secondary:hover {
+            background: #f0f0f0;
+        }
+
+        /* Hide actions on mobile for app-like feel */
+        @media (max-width: 768px) {
+            .actions {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="wrapper">
 
-  <div class="powerbi-container">
-    <div class="loading-overlay" id="loadingOverlay">
-      Loading dashboard…
+    <div class="powerbi-container">
+        <div class="loading-overlay" id="loadingOverlay">
+            Loading dashboard…
+        </div>
+
+        <iframe
+            id="pbiFrame"
+            title="Cattle Weekly Metrics"
+            allowfullscreen>
+        </iframe>
     </div>
 
-    <iframe id="pbiFrame" allowfullscreen></iframe>
-  </div>
-
-  <div class="actions">
-    <button class="btn" onclick="openFullScreen()">📊 Fullscreen</button>
-  </div>
+    <div class="actions">
+        <button class="btn" onclick="openFullScreen()">📊 Fullscreen</button>
+        <button class="btn secondary" onclick="openGithubPage()">🔗 View Full Dashboard</button>
+        <button class="btn secondary" onclick="refreshReport()">🔄 Refresh</button>
+    </div>
 
 </div>
 
 <script>
-  const iframe = document.getElementById("pbiFrame");
-  const loadingOverlay = document.getElementById("loadingOverlay");
+    const iframe = document.getElementById("pbiFrame");
+    const loadingOverlay = document.getElementById("loadingOverlay");
 
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
-  // DESKTOP REPORT (original)
-  const DESKTOP_REPORT =
-    "https://app.powerbi.com/view?r=eyJrIjoiNGVhOGM0NDgtYmFhOC00MzI0LTk5YzEtYTk5MjEzOWE3OTQ2IiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9";
+    const baseUrl = "https://app.powerbi.com/view?r=eyJrIjoiNGVhOGM0NDgtYmFhOC00MzI0LTk5YzEtYTk5MjEzOWE3OTQ2IiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9";
 
-  // MOBILE REPORT (your new one)
-  const MOBILE_REPORT =
-    "https://app.powerbi.com/view?r=eyJrIjoiMTJjNTdlNTQtYzgzOC00NDEzLWJjNGYtZWQ0YWU4NjA0OTVjIiwidCI6IjRiZjI5M2I5LTczYWMtNDJmZC1hMWQ1LWRkMjVmMTI3NTQ3YiJ9";
+    const mobileSrc =
+        baseUrl +
+        "&navContentPaneEnabled=false" +
+        "&filterPaneEnabled=false" +
+        "&displayMedium=fitToPage";
 
-  iframe.src = isMobile
-    ? MOBILE_REPORT + "&navContentPaneEnabled=false&filterPaneEnabled=false"
-    : DESKTOP_REPORT + "&navContentPaneEnabled=false&filterPaneEnabled=false";
+    const desktopSrc =
+        baseUrl +
+        "&navContentPaneEnabled=false" +
+        "&filterPaneEnabled=false" +
+        "&displayMedium=fitToWidth";
 
-  iframe.addEventListener("load", () => {
-    loadingOverlay.style.display = "none";
-  });
+    iframe.src = isMobile ? mobileSrc : desktopSrc;
 
-  function openFullScreen() {
-    iframe.requestFullscreen?.() || iframe.webkitRequestFullscreen?.();
-  }
+    iframe.addEventListener("load", () => {
+        setTimeout(() => {
+            loadingOverlay.style.display = "none";
+        }, 600);
+    });
+
+    function openFullScreen() {
+        iframe.requestFullscreen?.() || iframe.webkitRequestFullscreen?.();
+    }
+
+    function openGithubPage() {
+        window.open(
+            "https://mcmanusm.github.io/Cattle_Comments/",
+            "_blank"
+        );
+    }
+
+    function refreshReport() {
+        loadingOverlay.style.display = "flex";
+        iframe.src = iframe.src;
+    }
 </script>
 
 </body>

@@ -42,6 +42,22 @@ const puppeteer = require('puppeteer');
     const url = "https://mcmanusm.github.io/Cattle_Comments/table.html";
 
     // --------------------------------------------------------
+    // LOAD PREVIOUS METRICS (FOR CHANGE DETECTION)
+    // --------------------------------------------------------
+
+    // If a previous metrics.json file exists, load it so we can
+    // compare old vs new values and avoid unnecessary commits
+    let previousMetrics = null;
+    const outputFile = "metrics.json";
+
+    if (fs.existsSync(outputFile)) {
+        previousMetrics = JSON.parse(fs.readFileSync(outputFile, "utf8"));
+        console.log("Loaded previous metrics for comparison");
+    } else {
+        console.log("No previous metrics file found; full write will occur");
+    }
+
+    // --------------------------------------------------------
     // LAUNCH HEADLESS BROWSER
     // --------------------------------------------------------
 
@@ -109,7 +125,7 @@ const puppeteer = require('puppeteer');
     // --------------------------------------------------------
 
     const lines = allText
-        .split("\n")           // Split text into lines
+        .split("\n")            // Split text into lines
         .map(l => l.trim())     // Remove leading/trailing whitespace
         .filter(Boolean);       // Remove empty lines
 
@@ -178,12 +194,29 @@ const puppeteer = require('puppeteer');
     console.log("SCRAPED METRICS:", metrics);
 
     // --------------------------------------------------------
+    // CHANGE DETECTION
+    // --------------------------------------------------------
+
+    // If previous metrics exist and nothing has changed,
+    // exit early without writing or committing
+    if (
+        previousMetrics &&
+        JSON.stringify(previousMetrics) === JSON.stringify(metrics)
+    ) {
+        console.log("No metric changes detected; skipping file write");
+        await browser.close();
+        return; // Successful exit with no changes
+    }
+
+    console.log("Metric changes detected; writing updated file");
+
+    // --------------------------------------------------------
     // WRITE OUTPUT TO JSON FILE
     // --------------------------------------------------------
 
     // Save results in a machine-readable format
     fs.writeFileSync(
-        "metrics.json",
+        outputFile,
         JSON.stringify(metrics, null, 2) // Pretty-print with indentation
     );
 
@@ -193,5 +226,7 @@ const puppeteer = require('puppeteer');
 
     // Always close the browser to free resources
     await browser.close();
+
+    console.log("Scrape completed successfully");
 
 })();

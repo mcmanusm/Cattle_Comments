@@ -183,12 +183,14 @@ const puppeteer = require('puppeteer');
     // --------------------------------------------------------
 
     // Convert positional rows into semantically named metrics
-    const metrics = {
-        this_week: rows[0],
-        last_week: rows[1],
-        two_weeks_ago: rows[2],
-        three_weeks_ago: rows[3]
-    };
+        const metrics = {
+          updated_at: new Date().toISOString(), // UTC timestamp of scrape
+          this_week: rows[0],
+          last_week: rows[1],
+          two_weeks_ago: rows[2],
+          three_weeks_ago: rows[3]
+        };
+
 
     // Log final structured output
     console.log("SCRAPED METRICS:", metrics);

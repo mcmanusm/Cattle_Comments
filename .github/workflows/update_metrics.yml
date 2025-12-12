@@ -1,33 +1,86 @@
 name: Update PowerBI Metrics
 
-on:
-  schedule:
-    - cron: "0 0 * * *"   # runs daily at midnight UTC
-  workflow_dispatch: {}    # allow manual run
 
-jobs:
-  scrape:
-    runs-on: ubuntu-latest
+# ------------------------------------------------------------
+# INSTALL DEPENDENCIES
+# ------------------------------------------------------------
+- name: Install dependencies
+run: npm install puppeteer
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+# ------------------------------------------------------------
+# DECIDE WHETHER THIS RUN SHOULD SCRAPE (DST-SAFE)
+# ------------------------------------------------------------
+- name: Determine local AU time
+id: timecheck
+run: |
+# Convert current UTC time to Australia/Sydney
+# This automatically handles daylight savings (AEST vs AEDT)
+NOW_LOCAL=$(TZ=Australia/Sydney date '+%H:%M')
+DAY_OF_WEEK=$(TZ=Australia/Sydney date '+%u')
 
-      - name: Install dependencies
-        run: npm install puppeteer
 
-      - name: Run scraper
-        run: node scripts/scrape_metrics.js
+echo "Local time: $NOW_LOCAL"
+echo "Day of week: $DAY_OF_WEEK"
 
-      - name: Commit and push metrics.json
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git add metrics.json
-          git commit -m "Updated metrics" || echo "No changes to commit"
-          git push
+
+SHOULD_RUN=false
+
+
+# Monday–Thursday (1–4): run at 17:00
+if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] && [ "$NOW_LOCAL" = "17:00" ]; then
+SHOULD_RUN=true
+fi
+
+
+# Friday (5): run at 12:00, 14:00, 15:00, 16:00, 17:00
+if [ "$DAY_OF_WEEK" = "5" ]; then
+case "$NOW_LOCAL" in
+12:00|14:00|15:00|16:00|17:00)
+SHOULD_RUN=true
+;;
+esac
+fi
+
+
+echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
+
+
+# ------------------------------------------------------------
+# RUN SCRAPER (ONLY IF TIME MATCHES)
+# ------------------------------------------------------------
+- name: Run scraper
+if: steps.timecheck.outputs.should_run == 'true'
+run: node scripts/scrape_metrics.js
+
+
+# ------------------------------------------------------------
+# COMMIT CHANGES ONLY IF FILE HAS CHANGED
+# ------------------------------------------------------------
+- name: Commit and push metrics.json
+if: steps.timecheck.outputs.should_run == 'true'
+run: |
+git config --global user.name "GitHub Action"
+git config --global user.email "action@github.com"
+
+
+# Check if metrics.json changed
+if git diff --quiet metrics.json; then
+echo "No changes detected; skipping commit"
+exit 0
+fi
+
+
+git add metrics.json
+git commit -m "Update Power BI metrics"
+git push
+
+
+# ------------------------------------------------------------
+# ALERT ON FAILURE
+# ------------------------------------------------------------
+- name: Alert on failure
+if: failure()
+run: |
+echo "❌ Power BI scrape failed" >&2
+# Hook point for Slack / email / webhook later

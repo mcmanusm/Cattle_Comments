@@ -2,18 +2,24 @@ name: Update PowerBI Metrics
 
 on:
   workflow_dispatch: {}
+  schedule:
+    - cron: "*/5 * * * *"
+
+concurrency:
+  group: update-powerbi-metrics
+  cancel-in-progress: false
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    steps:
 
+    steps:
       # ------------------------------------------------------------
-      # CHECKOUT REPOSITORY (REQUIRED)
+      # CHECKOUT REPOSITORY
       # ------------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v3
-      
+
       # ------------------------------------------------------------
       # INSTALL DEPENDENCIES
       # ------------------------------------------------------------
@@ -21,39 +27,37 @@ jobs:
         run: npm install puppeteer
 
       # ------------------------------------------------------------
-      # DECIDE WHETHER THIS RUN SHOULD SCRAPE (DST-SAFE)
+      # DETERMINE WHETHER THIS RUN SHOULD SCRAPE (DST-SAFE)
       # ------------------------------------------------------------
       - name: Determine local AU time
         id: timecheck
         run: |
-          # Convert current UTC time to Australia/Sydney
-          # This automatically handles daylight savings (AEST vs AEDT)
-          NOW_LOCAL=$(TZ=Australia/Sydney date '+%H:%M')
+          NOW_UTC=$(date -u '+%Y-%m-%d %H:%M')
+          NOW_LOCAL=$(TZ=Australia/Sydney date '+%Y-%m-%d %H:%M')
           DAY_OF_WEEK=$(TZ=Australia/Sydney date '+%u')
 
-          echo "Local time: $NOW_LOCAL"
+          echo "UTC time:    $NOW_UTC"
+          echo "Local time:  $NOW_LOCAL"
           echo "Day of week: $DAY_OF_WEEK"
+          echo "Event:       $GITHUB_EVENT_NAME"
 
           SHOULD_RUN=false
 
           # Monday–Thursday (1–4): run at 17:00
-          if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] && [ "$NOW_LOCAL" = "17:00" ]; then
+          if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] && [[ "$NOW_LOCAL" == *"17:00" ]]; then
             SHOULD_RUN=true
           fi
 
           # Friday (5): run at 12:00, 14:00, 15:00, 16:00, 17:00
           if [ "$DAY_OF_WEEK" = "5" ]; then
             case "$NOW_LOCAL" in
-              12:00|14:00|15:00|16:00|17:00)
+              *"12:00"|*"14:00"|*"15:00"|*"16:00"|*"17:00")
                 SHOULD_RUN=true
                 ;;
             esac
           fi
 
-          # --------------------------------------------------------
-          # MANUAL RUN OVERRIDE
-          # --------------------------------------------------------
-          # If the workflow was triggered manually, always run
+          # Manual run override
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
             echo "Manual run detected – forcing scrape"
             SHOULD_RUN=true

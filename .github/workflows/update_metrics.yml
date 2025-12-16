@@ -43,13 +43,26 @@ jobs:
 
           SHOULD_RUN=false
 
+          # --------------------------------------------------------
+          # 🔴 TEMPORARY TEST SLOT — REMOVE AFTER TESTING
+          # --------------------------------------------------------
+          # Allow automatic scrape at 20:45 Sydney time (test only)
+          if [ "$HOUR" = "20" ] && [ "$MINUTE" = "45" ]; then
+            echo "🧪 Test window matched (20:45 Sydney)"
+            SHOULD_RUN=true
+          fi
+
+          # --------------------------------------------------------
           # Mon–Thu (1–4) at exactly 17:00
+          # --------------------------------------------------------
           if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] \
              && [ "$HOUR" = "17" ] && [ "$MINUTE" = "00" ]; then
             SHOULD_RUN=true
           fi
 
+          # --------------------------------------------------------
           # Friday (5) at exactly 12,14,15,16,17
+          # --------------------------------------------------------
           if [ "$DAY_OF_WEEK" = "5" ] && [ "$MINUTE" = "00" ]; then
             case "$HOUR" in
               12|14|15|16|17)
@@ -58,7 +71,9 @@ jobs:
             esac
           fi
 
+          # --------------------------------------------------------
           # Manual override
+          # --------------------------------------------------------
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
             echo "Manual run detected – forcing scrape"
             SHOULD_RUN=true

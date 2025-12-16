@@ -44,12 +44,14 @@ jobs:
           SHOULD_RUN=false
 
           # --------------------------------------------------------
-          # 🧪 TEMPORARY TEST WINDOW (20:50–21:00 Sydney)
+          # TEMPORARY TEST WINDOW (21:10–21:15 Sydney)
           # --------------------------------------------------------
-          if [ "$HOUR" = "20" -a "$MINUTE" -ge 50 ] || [ "$HOUR" = "21" -a "$MINUTE" = "00" ]; then
-            echo "🧪 Test window matched (20:50–21:00 Sydney)"
+          if [ "$HOUR" = "21" -a "$MINUTE" -ge 10 -a "$MINUTE" -le 15 ]; then
+            echo "TEST WINDOW MATCHED (21:10–21:15 Sydney)"
             SHOULD_RUN=true
           fi
+
+
 
           
           # --------------------------------------------------------

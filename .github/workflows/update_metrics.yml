@@ -30,21 +30,24 @@ jobs:
           sudo apt-get install -y jq
 
       # ------------------------------------------------------------
-      # CHECK IF SCRAPE IS NEEDED (runs every time)
+      # BACKUP OLD METRICS (before scraping)
       # ------------------------------------------------------------
-      - name: Check current time
-        id: timecheck
+      - name: Backup old metrics
+        id: backup
         run: |
-          TODAY=$(TZ=Australia/Sydney date '+%Y-%m-%d %H:%M:%S %Z')
-          echo "Sydney time: $TODAY"
-          echo "Running hourly scrape check..."
-          echo "should_run=true" >> $GITHUB_OUTPUT
+          if [ -f "metrics.json" ]; then
+            cp metrics.json metrics.old.json
+            echo "has_backup=true" >> $GITHUB_OUTPUT
+            echo "✓ Backed up existing metrics.json"
+          else
+            echo "has_backup=false" >> $GITHUB_OUTPUT
+            echo "ℹ No existing metrics.json to backup"
+          fi
 
       # ------------------------------------------------------------
       # RUN SCRAPER
       # ------------------------------------------------------------
       - name: Run scraper
-        if: steps.timecheck.outputs.should_run == 'true'
         run: |
           echo "Running scraper..."
           node scripts/scrape_metrics.js
@@ -56,65 +59,34 @@ jobs:
       # ------------------------------------------------------------
       - name: Check if metrics changed
         id: check_changes
-        if: steps.timecheck.outputs.should_run == 'true'
         run: |
-          # Create backup of old metrics if it exists
-          if [ -f "metrics.json" ]; then
-            cp metrics.json metrics.old.json
-            echo "has_old_metrics=true" >> $GITHUB_OUTPUT
+          if [ "${{ steps.backup.outputs.has_backup }}" = "true" ]; then
+            if cmp -s metrics.json metrics.old.json; then
+              echo "changed=false" >> $GITHUB_OUTPUT
+              echo "✗ Metrics unchanged"
+            else
+              echo "changed=true" >> $GITHUB_OUTPUT
+              echo "✓ Metrics changed"
+            fi
+            rm metrics.old.json
           else
-            echo "has_old_metrics=false" >> $GITHUB_OUTPUT
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "✓ First run - will commit"
           fi
 
       # ------------------------------------------------------------
-      # UPDATE AUTOMATION STATE
-      # ------------------------------------------------------------
-      - name: Update automation state
-        if: steps.timecheck.outputs.should_run == 'true'
-        run: |
-          SLOT="${{ steps.timecheck.outputs.slot }}"
-          TODAY=$(TZ=Australia/Sydney date '+%Y-%m-%d')
-
-          echo "Updating state: $SLOT -> $TODAY"
-          
-          # Create state file if it doesn't exist
-          if [ ! -f "automation_state.json" ]; then
-            echo '{"runs":{}}' > automation_state.json
-          fi
-          
-          jq ".runs[\"$SLOT\"] = \"$TODAY\"" automation_state.json > tmp.json
-          mv tmp.json automation_state.json
-          
-          echo "Updated state file:"
-          cat automation_state.json
-
-      # ------------------------------------------------------------
-      # COMMIT CHANGES (only if metrics actually changed)
+      # COMMIT CHANGES (only if metrics changed)
       # ------------------------------------------------------------
       - name: Commit and push changes
-        if: steps.timecheck.outputs.should_run == 'true'
+        if: steps.check_changes.outputs.changed == 'true'
         run: |
-          # Compare old and new metrics
-          if [ -f "metrics.old.json" ]; then
-            if cmp -s metrics.json metrics.old.json; then
-              echo "✗ Metrics unchanged — skipping commit"
-              rm metrics.old.json
-              exit 0
-            else
-              echo "✓ Metrics changed — committing update"
-              rm metrics.old.json
-            fi
-          else
-            echo "✓ First run or no previous metrics — committing"
-          fi
-
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
 
           git add metrics.json
 
           if git diff --cached --quiet; then
-            echo "No changes detected; skipping commit"
+            echo "✗ No changes to commit (shouldn't happen)"
             exit 0
           fi
 

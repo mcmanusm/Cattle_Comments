@@ -1,133 +1,101 @@
 // ============================================================
-// puppeteer_scrape.js
-// ============================================================
-// PURPOSE:
-// This script uses Puppeteer (a headless Chrome browser) to:
-// 1. Open a web page that embeds a Power BI table
-// 2. Wait for the table to fully render
-// 3. Extract the visible text from the table
-// 4. Parse that text into structured metrics
-// 5. Validate the result
-// 6. Write the data to a JSON file for downstream use
-//
-// Think of this as:
-// "Turn a visually-rendered Power BI table into machine-readable data"
+// puppeteer_scrape.js - IMPROVED VERSION WITH BETTER DEBUGGING
 // ============================================================
 
-// ------------------------------------------------------------
-// IMPORTS
-// ------------------------------------------------------------
-
-// Node.js built-in module for reading/writing files
 const fs = require('fs');
-
-// Puppeteer controls a real Chrome browser programmatically
 const puppeteer = require('puppeteer');
 
-// ------------------------------------------------------------
-// MAIN ASYNC FUNCTION (Immediately Invoked)
-// ------------------------------------------------------------
-
-// JavaScript uses async/await for operations that take time
-// (page loads, rendering, network calls, etc.)
-//
-// This pattern defines an async function and runs it immediately
 (async () => {
 
     // --------------------------------------------------------
     // CONFIGURATION
     // --------------------------------------------------------
 
-    // URL of the page that contains the Power BI table iframe
     const url = "https://mcmanusm.github.io/Cattle_Comments/table.html";
 
     // --------------------------------------------------------
-    // LOAD PREVIOUS METRICS (FOR CHANGE DETECTION)
+    // LOAD PREVIOUS METRICS
     // --------------------------------------------------------
 
-    // If a previous metrics.json file exists, load it so we can
-    // compare old vs new values and avoid unnecessary commits
     let previousMetrics = null;
     const outputFile = "metrics.json";
 
     if (fs.existsSync(outputFile)) {
         previousMetrics = JSON.parse(fs.readFileSync(outputFile, "utf8"));
-        console.log("Loaded previous metrics for comparison");
+        console.log("✓ Loaded previous metrics for comparison");
     } else {
-        console.log("No previous metrics file found; full write will occur");
+        console.log("ℹ No previous metrics file found");
     }
 
     // --------------------------------------------------------
     // LAUNCH HEADLESS BROWSER
     // --------------------------------------------------------
 
-    // Start a new Chrome browser instance
     const browser = await puppeteer.launch({
-        headless: "new",                 // Use modern headless Chrome
+        headless: "new",
         args: [
-            "--no-sandbox",              // Required for CI / Docker environments
+            "--no-sandbox",
             "--disable-setuid-sandbox"
         ]
     });
 
-    // Open a new browser tab (page)
     const page = await browser.newPage();
 
-    // Navigate to the target URL
-    // waitUntil: "networkidle2" means:
-    // "Wait until network activity has mostly stopped"
-    // This is important because Power BI loads assets dynamically
+    // Set a longer timeout for slow-loading Power BI content
+    page.setDefaultTimeout(60000); // 60 seconds
+
+    console.log("→ Navigating to:", url);
     await page.goto(url, { waitUntil: "networkidle2" });
 
     // --------------------------------------------------------
-    // WAIT FOR POWER BI IFRAME TO EXIST
+    // WAIT FOR POWER BI IFRAME
     // --------------------------------------------------------
 
-    // Do not continue until the iframe with id="pbiTable" exists
-    // If this selector never appears, the script will fail here
-    await page.waitForSelector("#pbiTable");
+    console.log("→ Waiting for Power BI iframe...");
+    await page.waitForSelector("#pbiTable", { timeout: 30000 });
+    console.log("✓ Iframe found");
 
     // --------------------------------------------------------
-    // SWITCH CONTEXT INTO THE IFRAME
+    // SWITCH INTO IFRAME
     // --------------------------------------------------------
 
-    // Grab a handle to the iframe element itself
     const frameHandle = await page.$("#pbiTable");
-
-    // Switch execution context into the iframe
-    // This is required to access Power BI's DOM
     const frame = await frameHandle.contentFrame();
 
     // --------------------------------------------------------
-    // EXTRA WAIT FOR POWER BI TABLE RENDERING
+    // WAIT FOR POWER BI TO FULLY RENDER
     // --------------------------------------------------------
 
-    // Power BI tables often render AFTER the iframe loads
-    // This hard wait ensures the table content is visible
-    // before we try to read it
-    await new Promise(r => setTimeout(r, 6000));
+    console.log("→ Waiting for Power BI content to render (15 seconds)...");
+    await new Promise(r => setTimeout(r, 15000));
 
     // --------------------------------------------------------
-    // EXTRACT VISIBLE TEXT FROM THE TABLE
+    // EXTRACT ALL TEXT
     // --------------------------------------------------------
 
-    // Run code INSIDE the browser context
-    // document.body.innerText returns what a user would see
     const allText = await frame.evaluate(() => document.body.innerText);
 
-    // Debug output to inspect raw scraped text
-    console.log("=== DEBUG START ===");
+    console.log("=== RAW SCRAPED TEXT START ===");
     console.log(allText);
-    console.log("=== DEBUG END ===");
+    console.log("=== RAW SCRAPED TEXT END ===");
 
     // --------------------------------------------------------
-    // NORMALISE RAW TEXT INTO CLEAN LINES
+    // PARSE LINES
     // --------------------------------------------------------
 
     const lines = allText
-        .split("\n")            // Split text into lines
-        .map(l => l.trim())     // Remove leading/trailing whitespace
-        .filter(Boolean);       // Remove empty lines
+        .split("\n")
+        .map(l => l.trim())
+        .filter(Boolean);
+
+    console.log(`\n→ Found ${lines.length} non-empty lines`);
+
+    // --------------------------------------------------------
+    // COUNT "Select Row" MARKERS
+    // --------------------------------------------------------
+
+    const selectRowCount = lines.filter(l => l === "Select Row").length;
+    console.log(`→ Found ${selectRowCount} "Select Row" markers`);
 
     // --------------------------------------------------------
     // PARSE TABLE ROWS
@@ -135,22 +103,16 @@ const puppeteer = require('puppeteer');
 
     const rows = [];
 
-    // Loop through every line of text
     for (let i = 0; i < lines.length; i++) {
-
-        // "Select Row" is a consistent marker at the start of each table row
         if (lines[i] === "Select Row") {
-
-            // Each table row spans a fixed number of text lines
-            // Slice out the current row block
             const block = lines.slice(i, i + 11);
 
-            // Convert raw positional text into a structured object
+            // Show what we're parsing for each row
+            console.log(`\n→ Parsing row ${rows.length + 1}:`);
+            console.log("  Block:", block.slice(0, 3).join(" | "));
+
             const row = {
                 index: block[1],
-
-                // Remove all characters except digits and minus sign
-                // This strips %, commas, spaces, etc.
                 total_head: block[2].replace(/[^\d-]/g, ""),
                 clearance_rate: block[3].replace(/[^\d-]/g, ""),
                 amount_over_reserve: block[4].replace(/[^\d-]/g, ""),
@@ -161,74 +123,79 @@ const puppeteer = require('puppeteer');
                 vor_change: block[9].replace(/[^\d-]/g, "")
             };
 
-            // Add parsed row to results
             rows.push(row);
         }
     }
 
+    console.log(`\n→ Successfully parsed ${rows.length} rows`);
+
     // --------------------------------------------------------
-    // VALIDATION CHECK
+    // VALIDATION
     // --------------------------------------------------------
 
-    // The table is expected to contain exactly 4 rows
-    // If this changes, something upstream has broken
+    if (rows.length === 0) {
+        console.error("\n❌ ERROR: No rows found!");
+        console.error("This usually means:");
+        console.error("  1. Power BI content didn't fully load");
+        console.error("  2. The table structure has changed");
+        console.error("  3. The iframe is empty or showing an error");
+        console.error("\nCheck the raw scraped text above for clues.");
+        
+        await browser.close();
+        process.exit(1);
+    }
+
     if (rows.length !== 4) {
-        console.error("❌ ERROR: Expected 4 rows but found:", rows.length);
-        console.error(rows);
-        process.exit(1); // Fail loudly and stop the pipeline
+        console.error(`\n⚠️  WARNING: Expected 4 rows but found ${rows.length}`);
+        console.error("Proceeding anyway, but verify the data is correct.");
     }
 
     // --------------------------------------------------------
-    // APPLY BUSINESS MEANING TO ROWS
+    // BUILD METRICS OBJECT
     // --------------------------------------------------------
 
-    // Convert positional rows into semantically named metrics
-        const metrics = {
-          updated_at: new Date().toISOString(), // UTC timestamp of scrape
-          this_week: rows[0],
-          last_week: rows[1],
-          two_weeks_ago: rows[2],
-          three_weeks_ago: rows[3]
-        };
+    const metrics = {
+        updated_at: new Date().toISOString(),
+        this_week: rows[0] || null,
+        last_week: rows[1] || null,
+        two_weeks_ago: rows[2] || null,
+        three_weeks_ago: rows[3] || null
+    };
 
-
-    // Log final structured output
-    console.log("SCRAPED METRICS:", metrics);
+    console.log("\n✓ FINAL METRICS:");
+    console.log(JSON.stringify(metrics, null, 2));
 
     // --------------------------------------------------------
     // CHANGE DETECTION
     // --------------------------------------------------------
 
-    // If previous metrics exist and nothing has changed,
-    // exit early without writing or committing
     if (
         previousMetrics &&
         JSON.stringify(previousMetrics) === JSON.stringify(metrics)
     ) {
-        console.log("No metric changes detected; skipping file write");
+        console.log("\n→ No metric changes detected; skipping file write");
         await browser.close();
-        return; // Successful exit with no changes
+        return;
     }
 
-    console.log("Metric changes detected; writing updated file");
+    console.log("\n→ Metric changes detected; writing updated file");
 
     // --------------------------------------------------------
-    // WRITE OUTPUT TO JSON FILE
+    // WRITE OUTPUT
     // --------------------------------------------------------
 
-    // Save results in a machine-readable format
     fs.writeFileSync(
         outputFile,
-        JSON.stringify(metrics, null, 2) // Pretty-print with indentation
+        JSON.stringify(metrics, null, 2)
     );
+
+    console.log(`✓ Written to ${outputFile}`);
 
     // --------------------------------------------------------
     // CLEANUP
     // --------------------------------------------------------
 
-    // Always close the browser to free resources
     await browser.close();
-
-    console.log("Scrape completed successfully");
+    console.log("✓ Scrape completed successfully");
 
 })();

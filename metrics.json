@@ -1,15 +1,15 @@
 {
-  "updated_at": "2025-12-12T14:58:59.078Z",
+  "updated_at": "2025-12-16T18:42:14.845Z",
   "this_week": {
     "index": "1",
     "total_head": "16753",
-    "clearance_rate": "67",
-    "amount_over_reserve": "34",
-    "ayci_dw": "973",
-    "ayci_change": "-14",
-    "total_head_change": "-8",
-    "clearance_rate_change": "-4",
-    "vor_change": "-73"
+    "clearance_rate": "76",
+    "amount_over_reserve": "23",
+    "ayci_dw": "969",
+    "ayci_change": "-18",
+    "total_head_change": "-7",
+    "clearance_rate_change": "5",
+    "vor_change": "-84"
   },
   "last_week": {
     "index": "2",

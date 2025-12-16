@@ -38,34 +38,32 @@ jobs:
           TODAY=$(TZ=Australia/Sydney date '+%Y-%m-%d')
           DAY_OF_WEEK=$(TZ=Australia/Sydney date '+%u')
           HOUR=$(TZ=Australia/Sydney date '+%H')
-          MINUTE=$(TZ=Australia/Sydney date '+%M')
 
           echo "Today: $TODAY"
           echo "Day of week: $DAY_OF_WEEK"
           echo "Hour: $HOUR"
-          echo "Minute: $MINUTE"
           echo "Event: $GITHUB_EVENT_NAME"
 
           SHOULD_RUN=false
           SLOT=""
 
           # --------------------------------------------------------
-          # 🔴 TEMPORARY TEST OVERRIDE — RUN ONCE AFTER 21:25 SYDNEY
+          # SAFETY NET: DAILY RECONCILIATION (AFTER 02:00 SYDNEY)
           # --------------------------------------------------------
-          if [ "$HOUR" -ge 21 ] && [ "$MINUTE" -ge 25 ]; then
-            SLOT="test_925"
+          if [ "$HOUR" -ge 22 ]; then
+            SLOT="daily_reconcile"
           fi
 
           # --------------------------------------------------------
-          # NORMAL PRODUCTION LOGIC (UNCHANGED)
+          # Mon–Thu: once after 5pm Sydney
           # --------------------------------------------------------
-
-          # Mon–Thu: once after 5pm
           if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] && [ "$HOUR" -ge 17 ]; then
             SLOT="weekday_5pm"
           fi
 
+          # --------------------------------------------------------
           # Friday slots
+          # --------------------------------------------------------
           if [ "$DAY_OF_WEEK" = "5" ]; then
             if [ "$HOUR" -ge 12 ]; then SLOT="fri_12"; fi
             if [ "$HOUR" -ge 14 ]; then SLOT="fri_14"; fi
@@ -90,7 +88,9 @@ jobs:
             echo "No valid slot yet — skipping"
           fi
 
+          # --------------------------------------------------------
           # Manual override
+          # --------------------------------------------------------
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
             echo "Manual run detected — forcing scrape"
             SHOULD_RUN=true

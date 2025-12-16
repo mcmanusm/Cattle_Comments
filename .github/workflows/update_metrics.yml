@@ -3,7 +3,8 @@ name: Update PowerBI Metrics
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "*/5 * * * *"
+    # Run every hour
+    - cron: "0 * * * *"
 
 concurrency:
   group: update-powerbi-metrics
@@ -29,82 +30,41 @@ jobs:
           sudo apt-get install -y jq
 
       # ------------------------------------------------------------
-      # DETERMINE WHETHER THIS RUN SHOULD SCRAPE
+      # CHECK IF SCRAPE IS NEEDED (runs every time)
       # ------------------------------------------------------------
-      - name: Determine local AU time
+      - name: Check current time
         id: timecheck
         run: |
-          STATE_FILE="automation_state.json"
-          TODAY=$(TZ=Australia/Sydney date '+%Y-%m-%d')
-          DAY_OF_WEEK=$(TZ=Australia/Sydney date '+%u')
-          HOUR=$(TZ=Australia/Sydney date '+%H')
-
-          echo "Today: $TODAY"
-          echo "Day of week: $DAY_OF_WEEK"
-          echo "Hour: $HOUR"
-          echo "Event: $GITHUB_EVENT_NAME"
-
-          SHOULD_RUN=false
-          SLOT=""
-
-          # --------------------------------------------------------
-          # SAFETY NET: DAILY RECONCILIATION (AFTER 02:00 SYDNEY)
-          # --------------------------------------------------------
-          if [ "$HOUR" -ge 22 ]; then
-            SLOT="daily_reconcile"
-          fi
-
-          # --------------------------------------------------------
-          # Mon–Thu: once after 5pm Sydney
-          # --------------------------------------------------------
-          if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] && [ "$HOUR" -ge 17 ]; then
-            SLOT="weekday_5pm"
-          fi
-
-          # --------------------------------------------------------
-          # Friday slots
-          # --------------------------------------------------------
-          if [ "$DAY_OF_WEEK" = "5" ]; then
-            if [ "$HOUR" -ge 12 ]; then SLOT="fri_12"; fi
-            if [ "$HOUR" -ge 14 ]; then SLOT="fri_14"; fi
-            if [ "$HOUR" -ge 15 ]; then SLOT="fri_15"; fi
-            if [ "$HOUR" -ge 16 ]; then SLOT="fri_16"; fi
-            if [ "$HOUR" -ge 17 ]; then SLOT="fri_17"; fi
-          fi
-
-          # --------------------------------------------------------
-          # DECIDE WHETHER TO RUN
-          # --------------------------------------------------------
-          if [ -n "$SLOT" ]; then
-            LAST_RUN=$(jq -r ".runs[\"$SLOT\"] // empty" "$STATE_FILE")
-
-            if [ "$LAST_RUN" != "$TODAY" ]; then
-              echo "Slot $SLOT has not run today — will run now"
-              SHOULD_RUN=true
-            else
-              echo "Slot $SLOT already ran today — skipping"
-            fi
-          else
-            echo "No valid slot yet — skipping"
-          fi
-
-          # --------------------------------------------------------
-          # Manual override
-          # --------------------------------------------------------
-          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            echo "Manual run detected — forcing scrape"
-            SHOULD_RUN=true
-          fi
-
-          echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
-          echo "slot=$SLOT" >> $GITHUB_OUTPUT
+          TODAY=$(TZ=Australia/Sydney date '+%Y-%m-%d %H:%M:%S %Z')
+          echo "Sydney time: $TODAY"
+          echo "Running hourly scrape check..."
+          echo "should_run=true" >> $GITHUB_OUTPUT
 
       # ------------------------------------------------------------
       # RUN SCRAPER
       # ------------------------------------------------------------
       - name: Run scraper
         if: steps.timecheck.outputs.should_run == 'true'
-        run: node scripts/scrape_metrics.js
+        run: |
+          echo "Running scraper..."
+          node scripts/scrape_metrics.js
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+
+      # ------------------------------------------------------------
+      # CHECK IF METRICS CHANGED
+      # ------------------------------------------------------------
+      - name: Check if metrics changed
+        id: check_changes
+        if: steps.timecheck.outputs.should_run == 'true'
+        run: |
+          # Create backup of old metrics if it exists
+          if [ -f "metrics.json" ]; then
+            cp metrics.json metrics.old.json
+            echo "has_old_metrics=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_old_metrics=false" >> $GITHUB_OUTPUT
+          fi
 
       # ------------------------------------------------------------
       # UPDATE AUTOMATION STATE
@@ -115,27 +75,54 @@ jobs:
           SLOT="${{ steps.timecheck.outputs.slot }}"
           TODAY=$(TZ=Australia/Sydney date '+%Y-%m-%d')
 
-          jq ".runs[\"$SLOT\"] = \"$TODAY\"" .automation_state.json > tmp.json
-          mv tmp.json .automation_state.json
+          echo "Updating state: $SLOT -> $TODAY"
+          
+          # Create state file if it doesn't exist
+          if [ ! -f "automation_state.json" ]; then
+            echo '{"runs":{}}' > automation_state.json
+          fi
+          
+          jq ".runs[\"$SLOT\"] = \"$TODAY\"" automation_state.json > tmp.json
+          mv tmp.json automation_state.json
+          
+          echo "Updated state file:"
+          cat automation_state.json
 
       # ------------------------------------------------------------
-      # COMMIT CHANGES
+      # COMMIT CHANGES (only if metrics actually changed)
       # ------------------------------------------------------------
       - name: Commit and push changes
         if: steps.timecheck.outputs.should_run == 'true'
         run: |
+          # Compare old and new metrics
+          if [ -f "metrics.old.json" ]; then
+            if cmp -s metrics.json metrics.old.json; then
+              echo "✗ Metrics unchanged — skipping commit"
+              rm metrics.old.json
+              exit 0
+            else
+              echo "✓ Metrics changed — committing update"
+              rm metrics.old.json
+            fi
+          else
+            echo "✓ First run or no previous metrics — committing"
+          fi
+
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
 
-          git add metrics.json .automation_state.json
+          git add metrics.json
 
           if git diff --cached --quiet; then
             echo "No changes detected; skipping commit"
             exit 0
           fi
 
-          git commit -m "Update Power BI metrics"
+          COMMIT_MSG="Update Power BI metrics [$(TZ=Australia/Sydney date '+%Y-%m-%d %H:%M %Z')]"
+          git commit -m "$COMMIT_MSG"
           git push
+          
+          echo "✓ Successfully committed and pushed changes"
 
       # ------------------------------------------------------------
       # ALERT ON FAILURE
@@ -143,4 +130,6 @@ jobs:
       - name: Alert on failure
         if: failure()
         run: |
-          echo "Power BI scrape failed" >&2
+          echo "❌ Power BI scrape failed" >&2
+          echo "Check the logs above for details" >&2
+          exit 1

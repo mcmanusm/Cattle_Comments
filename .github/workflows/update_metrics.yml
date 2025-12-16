@@ -34,7 +34,7 @@ jobs:
       - name: Determine local AU time
         id: timecheck
         run: |
-          STATE_FILE=".automation_state.json"
+          STATE_FILE="automation_state.json"
           TODAY=$(TZ=Australia/Sydney date '+%Y-%m-%d')
           DAY_OF_WEEK=$(TZ=Australia/Sydney date '+%u')
           HOUR=$(TZ=Australia/Sydney date '+%H')

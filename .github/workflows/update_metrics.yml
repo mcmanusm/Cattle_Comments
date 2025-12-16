@@ -44,14 +44,14 @@ jobs:
           SHOULD_RUN=false
 
           # --------------------------------------------------------
-          # 🔴 TEMPORARY TEST SLOT — REMOVE AFTER TESTING
+          # 🧪 TEMPORARY TEST WINDOW (20:50–21:00 Sydney)
           # --------------------------------------------------------
-          # Allow automatic scrape at 20:45 Sydney time (test only)
-          if [ "$HOUR" = "20" ] && [ "$MINUTE" = "45" ]; then
-            echo "🧪 Test window matched (20:45 Sydney)"
+          if [ "$HOUR" = "20" -a "$MINUTE" -ge 50 ] || [ "$HOUR" = "21" -a "$MINUTE" = "00" ]; then
+            echo "🧪 Test window matched (20:50–21:00 Sydney)"
             SHOULD_RUN=true
           fi
 
+          
           # --------------------------------------------------------
           # Mon–Thu (1–4) at exactly 17:00
           # --------------------------------------------------------

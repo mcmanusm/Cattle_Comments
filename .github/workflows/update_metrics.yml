@@ -27,37 +27,38 @@ jobs:
         run: npm install puppeteer
 
       # ------------------------------------------------------------
-      # DETERMINE WHETHER THIS RUN SHOULD SCRAPE (DST-SAFE)
+      # DETERMINE WHETHER THIS RUN SHOULD SCRAPE (EXACT TIME MATCH)
       # ------------------------------------------------------------
       - name: Determine local AU time
         id: timecheck
         run: |
-          NOW_UTC=$(date -u '+%Y-%m-%d %H:%M')
-          NOW_LOCAL=$(TZ=Australia/Sydney date '+%Y-%m-%d %H:%M')
           DAY_OF_WEEK=$(TZ=Australia/Sydney date '+%u')
+          HOUR=$(TZ=Australia/Sydney date '+%H')
+          MINUTE=$(TZ=Australia/Sydney date '+%M')
 
-          echo "UTC time:    $NOW_UTC"
-          echo "Local time:  $NOW_LOCAL"
           echo "Day of week: $DAY_OF_WEEK"
+          echo "Hour:        $HOUR"
+          echo "Minute:      $MINUTE"
           echo "Event:       $GITHUB_EVENT_NAME"
 
           SHOULD_RUN=false
 
-          # Monday–Thursday (1–4): run at 17:00
-          if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] && [[ "$NOW_LOCAL" == *"17:00" ]]; then
+          # Mon–Thu (1–4) at exactly 17:00
+          if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] \
+             && [ "$HOUR" = "17" ] && [ "$MINUTE" = "00" ]; then
             SHOULD_RUN=true
           fi
 
-          # Friday (5): run at 12:00, 14:00, 15:00, 16:00, 17:00
-          if [ "$DAY_OF_WEEK" = "5" ]; then
-            case "$NOW_LOCAL" in
-              *"12:00"|*"14:00"|*"15:00"|*"16:00"|*"17:00")
+          # Friday (5) at exactly 12,14,15,16,17
+          if [ "$DAY_OF_WEEK" = "5" ] && [ "$MINUTE" = "00" ]; then
+            case "$HOUR" in
+              12|14|15|16|17)
                 SHOULD_RUN=true
                 ;;
             esac
           fi
 
-          # Manual run override
+          # Manual override
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
             echo "Manual run detected – forcing scrape"
             SHOULD_RUN=true
@@ -66,14 +67,14 @@ jobs:
           echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
 
       # ------------------------------------------------------------
-      # RUN SCRAPER (ONLY IF TIME MATCHES OR MANUAL RUN)
+      # RUN SCRAPER
       # ------------------------------------------------------------
       - name: Run scraper
         if: steps.timecheck.outputs.should_run == 'true'
         run: node scripts/scrape_metrics.js
 
       # ------------------------------------------------------------
-      # COMMIT CHANGES ONLY IF FILE HAS CHANGED
+      # COMMIT CHANGES (ONLY IF FILE CHANGED)
       # ------------------------------------------------------------
       - name: Commit and push metrics.json
         if: steps.timecheck.outputs.should_run == 'true'
@@ -91,7 +92,7 @@ jobs:
           git push
 
       # ------------------------------------------------------------
-      # ALERT ON FAILURE
+      # FAIL LOUDLY IF SCRAPE FAILED
       # ------------------------------------------------------------
       - name: Alert on failure
         if: failure()

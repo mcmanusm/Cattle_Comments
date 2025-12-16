@@ -3,8 +3,8 @@ name: Update PowerBI Metrics
 on:
   workflow_dispatch: {}
   schedule:
-    # Run every hour
-    - cron: "0 * * * *"
+    # Run every 10 minutes for testing
+    - cron: "*/10 * * * *"
 
 concurrency:
   group: update-powerbi-metrics

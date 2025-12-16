@@ -29,7 +29,7 @@ jobs:
           sudo apt-get install -y jq
 
       # ------------------------------------------------------------
-      # DETERMINE WHETHER THIS RUN SHOULD SCRAPE (FAIL-PROOF)
+      # DETERMINE WHETHER THIS RUN SHOULD SCRAPE
       # ------------------------------------------------------------
       - name: Determine local AU time
         id: timecheck
@@ -38,25 +38,34 @@ jobs:
           TODAY=$(TZ=Australia/Sydney date '+%Y-%m-%d')
           DAY_OF_WEEK=$(TZ=Australia/Sydney date '+%u')
           HOUR=$(TZ=Australia/Sydney date '+%H')
+          MINUTE=$(TZ=Australia/Sydney date '+%M')
 
           echo "Today: $TODAY"
           echo "Day of week: $DAY_OF_WEEK"
           echo "Hour: $HOUR"
+          echo "Minute: $MINUTE"
           echo "Event: $GITHUB_EVENT_NAME"
 
-          SLOT=""
           SHOULD_RUN=false
+          SLOT=""
 
-          # -----------------------------
+          # --------------------------------------------------------
+          # 🔴 TEMPORARY TEST OVERRIDE — RUN ONCE AFTER 21:25 SYDNEY
+          # --------------------------------------------------------
+          if [ "$HOUR" -ge 21 ] && [ "$MINUTE" -ge 25 ]; then
+            SLOT="test_925"
+          fi
+
+          # --------------------------------------------------------
+          # NORMAL PRODUCTION LOGIC (UNCHANGED)
+          # --------------------------------------------------------
+
           # Mon–Thu: once after 5pm
-          # -----------------------------
           if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] && [ "$HOUR" -ge 17 ]; then
             SLOT="weekday_5pm"
           fi
 
-          # -----------------------------
           # Friday slots
-          # -----------------------------
           if [ "$DAY_OF_WEEK" = "5" ]; then
             if [ "$HOUR" -ge 12 ]; then SLOT="fri_12"; fi
             if [ "$HOUR" -ge 14 ]; then SLOT="fri_14"; fi
@@ -65,6 +74,9 @@ jobs:
             if [ "$HOUR" -ge 17 ]; then SLOT="fri_17"; fi
           fi
 
+          # --------------------------------------------------------
+          # DECIDE WHETHER TO RUN
+          # --------------------------------------------------------
           if [ -n "$SLOT" ]; then
             LAST_RUN=$(jq -r ".runs[\"$SLOT\"] // empty" "$STATE_FILE")
 

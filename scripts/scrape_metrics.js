@@ -53,8 +53,15 @@ const puppeteer = require("puppeteer");
     process.exit(1);
   }
 
-  // Give Power BI time to render table
-  await new Promise(r => setTimeout(r, 6000));
+  // --------------------------------------------------------
+  // WAIT FOR POWER BI TABLE CONTENT TO RENDER
+  // --------------------------------------------------------
+  
+  await frame.waitForFunction(
+    () => document.body.innerText.includes("Select Row"),
+    { timeout: 30000 }
+  );
+
 
   // --------------------------------------------------------
   // SCRAPE TEXT

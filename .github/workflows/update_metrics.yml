@@ -24,64 +24,68 @@ jobs:
       # INSTALL DEPENDENCIES
       # ------------------------------------------------------------
       - name: Install dependencies
-        run: npm install puppeteer
+        run: |
+          npm install puppeteer
+          sudo apt-get install -y jq
 
       # ------------------------------------------------------------
-      # DETERMINE WHETHER THIS RUN SHOULD SCRAPE (EXACT TIME MATCH)
+      # DETERMINE WHETHER THIS RUN SHOULD SCRAPE (FAIL-PROOF)
       # ------------------------------------------------------------
       - name: Determine local AU time
         id: timecheck
         run: |
+          STATE_FILE=".automation_state.json"
+          TODAY=$(TZ=Australia/Sydney date '+%Y-%m-%d')
           DAY_OF_WEEK=$(TZ=Australia/Sydney date '+%u')
           HOUR=$(TZ=Australia/Sydney date '+%H')
-          MINUTE=$(TZ=Australia/Sydney date '+%M')
 
+          echo "Today: $TODAY"
           echo "Day of week: $DAY_OF_WEEK"
-          echo "Hour:        $HOUR"
-          echo "Minute:      $MINUTE"
-          echo "Event:       $GITHUB_EVENT_NAME"
+          echo "Hour: $HOUR"
+          echo "Event: $GITHUB_EVENT_NAME"
 
+          SLOT=""
           SHOULD_RUN=false
 
-          # --------------------------------------------------------
-          # TEMPORARY TEST WINDOW (21:10–21:15 Sydney)
-          # --------------------------------------------------------
-          if [ "$HOUR" = "21" -a "$MINUTE" -ge 10 -a "$MINUTE" -le 15 ]; then
-            echo "TEST WINDOW MATCHED (21:10–21:15 Sydney)"
-            SHOULD_RUN=true
+          # -----------------------------
+          # Mon–Thu: once after 5pm
+          # -----------------------------
+          if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] && [ "$HOUR" -ge 17 ]; then
+            SLOT="weekday_5pm"
           fi
 
-
-
-          
-          # --------------------------------------------------------
-          # Mon–Thu (1–4) at exactly 17:00
-          # --------------------------------------------------------
-          if [ "$DAY_OF_WEEK" -ge 1 ] && [ "$DAY_OF_WEEK" -le 4 ] \
-             && [ "$HOUR" = "17" ] && [ "$MINUTE" = "00" ]; then
-            SHOULD_RUN=true
+          # -----------------------------
+          # Friday slots
+          # -----------------------------
+          if [ "$DAY_OF_WEEK" = "5" ]; then
+            if [ "$HOUR" -ge 12 ]; then SLOT="fri_12"; fi
+            if [ "$HOUR" -ge 14 ]; then SLOT="fri_14"; fi
+            if [ "$HOUR" -ge 15 ]; then SLOT="fri_15"; fi
+            if [ "$HOUR" -ge 16 ]; then SLOT="fri_16"; fi
+            if [ "$HOUR" -ge 17 ]; then SLOT="fri_17"; fi
           fi
 
-          # --------------------------------------------------------
-          # Friday (5) at exactly 12,14,15,16,17
-          # --------------------------------------------------------
-          if [ "$DAY_OF_WEEK" = "5" ] && [ "$MINUTE" = "00" ]; then
-            case "$HOUR" in
-              12|14|15|16|17)
-                SHOULD_RUN=true
-                ;;
-            esac
+          if [ -n "$SLOT" ]; then
+            LAST_RUN=$(jq -r ".runs[\"$SLOT\"] // empty" "$STATE_FILE")
+
+            if [ "$LAST_RUN" != "$TODAY" ]; then
+              echo "Slot $SLOT has not run today — will run now"
+              SHOULD_RUN=true
+            else
+              echo "Slot $SLOT already ran today — skipping"
+            fi
+          else
+            echo "No valid slot yet — skipping"
           fi
 
-          # --------------------------------------------------------
           # Manual override
-          # --------------------------------------------------------
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
-            echo "Manual run detected – forcing scrape"
+            echo "Manual run detected — forcing scrape"
             SHOULD_RUN=true
           fi
 
           echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
+          echo "slot=$SLOT" >> $GITHUB_OUTPUT
 
       # ------------------------------------------------------------
       # RUN SCRAPER
@@ -91,27 +95,40 @@ jobs:
         run: node scripts/scrape_metrics.js
 
       # ------------------------------------------------------------
-      # COMMIT CHANGES (ONLY IF FILE CHANGED)
+      # UPDATE AUTOMATION STATE
       # ------------------------------------------------------------
-      - name: Commit and push metrics.json
+      - name: Update automation state
+        if: steps.timecheck.outputs.should_run == 'true'
+        run: |
+          SLOT="${{ steps.timecheck.outputs.slot }}"
+          TODAY=$(TZ=Australia/Sydney date '+%Y-%m-%d')
+
+          jq ".runs[\"$SLOT\"] = \"$TODAY\"" .automation_state.json > tmp.json
+          mv tmp.json .automation_state.json
+
+      # ------------------------------------------------------------
+      # COMMIT CHANGES
+      # ------------------------------------------------------------
+      - name: Commit and push changes
         if: steps.timecheck.outputs.should_run == 'true'
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
 
-          if git diff --quiet metrics.json; then
+          git add metrics.json .automation_state.json
+
+          if git diff --cached --quiet; then
             echo "No changes detected; skipping commit"
             exit 0
           fi
 
-          git add metrics.json
           git commit -m "Update Power BI metrics"
           git push
 
       # ------------------------------------------------------------
-      # FAIL LOUDLY IF SCRAPE FAILED
+      # ALERT ON FAILURE
       # ------------------------------------------------------------
       - name: Alert on failure
         if: failure()
         run: |
-          echo "❌ Power BI scrape failed" >&2
+          echo "Power BI scrape failed" >&2

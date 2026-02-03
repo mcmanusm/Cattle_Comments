@@ -1,25 +1,25 @@
 {
-  "updated_at": "2026-02-03T05:40:50.490Z",
+  "updated_at": "2026-02-03T06:33:56.069Z",
   "this_week": {
     "index": "1",
     "total_head": "12639",
-    "clearance_rate": "44",
-    "amount_over_reserve": "98",
-    "ayci_dw": "938",
-    "ayci_change": "-8",
+    "clearance_rate": "51",
+    "amount_over_reserve": "80",
+    "ayci_dw": "927",
+    "ayci_change": "-18",
     "total_head_change": "-12",
-    "clearance_rate_change": "-17",
-    "vor_change": "51"
+    "clearance_rate_change": "-11",
+    "vor_change": "34"
   },
   "last_week": {
     "index": "2",
     "total_head": "14419",
     "clearance_rate": "62",
-    "amount_over_reserve": "47",
-    "ayci_dw": "946",
-    "ayci_change": "-2",
+    "amount_over_reserve": "46",
+    "ayci_dw": "945",
+    "ayci_change": "-3",
     "total_head_change": "31",
-    "clearance_rate_change": "-9",
+    "clearance_rate_change": "-8",
     "vor_change": "-27"
   },
   "two_weeks_ago": {

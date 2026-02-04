@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-02-04T00:01:30.058Z",
+  "updated_at": "2026-02-04T02:50:52.177Z",
   "this_week": {
     "index": "1",
     "total_head": "12639",
-    "clearance_rate": "51",
-    "amount_over_reserve": "80",
+    "clearance_rate": "52",
+    "amount_over_reserve": "79",
     "ayci_dw": "927",
     "ayci_change": "-18",
     "total_head_change": "-12",
     "clearance_rate_change": "-11",
-    "vor_change": "34"
+    "vor_change": "33"
   },
   "last_week": {
     "index": "2",

@@ -151,15 +151,22 @@ const puppeteer = require('puppeteer');
     }
 
     // --------------------------------------------------------
+    // REVERSE ROWS (Power BI renders oldest first, we want newest first)
+    // --------------------------------------------------------
+
+    const reversedRows = rows.reverse();
+    console.log("\n→ Reversed row order so this_week = most recent");
+
+    // --------------------------------------------------------
     // BUILD METRICS OBJECT
     // --------------------------------------------------------
 
     const metrics = {
         updated_at: new Date().toISOString(),
-        this_week: rows[0] || null,
-        last_week: rows[1] || null,
-        two_weeks_ago: rows[2] || null,
-        three_weeks_ago: rows[3] || null
+        this_week: reversedRows[0] || null,
+        last_week: reversedRows[1] || null,
+        two_weeks_ago: reversedRows[2] || null,
+        three_weeks_ago: reversedRows[3] || null
     };
 
     console.log("\n✓ FINAL METRICS:");

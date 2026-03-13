@@ -6,17 +6,22 @@
     "breed": "Angus/Angus",
     "count_of_lots": 4117,
     "head_offered": 172298,
-    "head_sold": 141327,
-    "clearance_rate": 0.8202,
-    "avg_price_per_head": 1797.12,
+    "head_sold": 141670,
+    "clearance_rate": 0.8222,
+    "avg_price_per_head": 1796.87,
     "min_price_per_head": 24.55,
     "max_price_per_head": 7000,
-    "avg_vor": 116.14,
+    "avg_vor": 115.41,
     "percent_over_reserve": 0.059,
-    "ckg_avg": 510.27,
-    "bid_rate": 0.9373,
+    "ckg_avg": 510.12,
+    "bid_rate": 0.9376,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "GLEN INNES"
+    "top_delivery_town": "GLEN INNES",
+    "state_total_lots": 6110,
+    "state_head_offered": 226365,
+    "state_head_sold": 181567,
+    "state_clearance_rate": 0.8021,
+    "state_avg_price_per_head": 1749.25
   },
   {
     "state": "New South Wales",
@@ -25,17 +30,22 @@
     "breed": "Hereford/Hereford",
     "count_of_lots": 297,
     "head_offered": 8623,
-    "head_sold": 6788,
-    "clearance_rate": 0.7872,
-    "avg_price_per_head": 1721.38,
+    "head_sold": 6829,
+    "clearance_rate": 0.792,
+    "avg_price_per_head": 1721.97,
     "min_price_per_head": 380,
     "max_price_per_head": 3200,
-    "avg_vor": 153.5,
-    "percent_over_reserve": 0.057,
-    "ckg_avg": 466.45,
+    "avg_vor": 152.53,
+    "percent_over_reserve": 0.056,
+    "ckg_avg": 466.32,
     "bid_rate": 0.9088,
-    "top_stock_category": "Steers",
-    "top_delivery_town": "WANTABADGERY"
+    "top_stock_category": "Yearlings",
+    "top_delivery_town": "WANTABADGERY",
+    "state_total_lots": 6110,
+    "state_head_offered": 226365,
+    "state_head_sold": 181567,
+    "state_clearance_rate": 0.8021,
+    "state_avg_price_per_head": 1749.25
   },
   {
     "state": "New South Wales",
@@ -44,17 +54,22 @@
     "breed": "Wagyu/Angus",
     "count_of_lots": 110,
     "head_offered": 4994,
-    "head_sold": 3297,
-    "clearance_rate": 0.6602,
-    "avg_price_per_head": 1365.53,
+    "head_sold": 3377,
+    "clearance_rate": 0.6762,
+    "avg_price_per_head": 1367.05,
     "min_price_per_head": 755,
     "max_price_per_head": 2300,
-    "avg_vor": 51.91,
-    "percent_over_reserve": 0.059,
-    "ckg_avg": 477.16,
+    "avg_vor": 50.45,
+    "percent_over_reserve": 0.057,
+    "ckg_avg": 477.43,
     "bid_rate": 0.8398,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "MERRIWA"
+    "top_delivery_town": "MERRIWA",
+    "state_total_lots": 6110,
+    "state_head_offered": 226365,
+    "state_head_sold": 181567,
+    "state_clearance_rate": 0.8021,
+    "state_avg_price_per_head": 1749.25
   },
   {
     "state": "New South Wales",
@@ -73,7 +88,12 @@
     "ckg_avg": 470.06,
     "bid_rate": 0.9729,
     "top_stock_category": "Yearlings",
-    "top_delivery_town": "WARREN"
+    "top_delivery_town": "WARREN",
+    "state_total_lots": 6110,
+    "state_head_offered": 226365,
+    "state_head_sold": 181567,
+    "state_clearance_rate": 0.8021,
+    "state_avg_price_per_head": 1749.25
   },
   {
     "state": "New South Wales",
@@ -92,7 +112,12 @@
     "ckg_avg": 480.01,
     "bid_rate": 0.9828,
     "top_stock_category": "Yearlings",
-    "top_delivery_town": "WALCHA"
+    "top_delivery_town": "WALCHA",
+    "state_total_lots": 6110,
+    "state_head_offered": 226365,
+    "state_head_sold": 181567,
+    "state_clearance_rate": 0.8021,
+    "state_avg_price_per_head": 1749.25
   },
   {
     "state": "New South Wales",
@@ -111,7 +136,12 @@
     "ckg_avg": 460.46,
     "bid_rate": 0.9417,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "GLEN INNES"
+    "top_delivery_town": "GLEN INNES",
+    "state_total_lots": 6110,
+    "state_head_offered": 226365,
+    "state_head_sold": 181567,
+    "state_clearance_rate": 0.8021,
+    "state_avg_price_per_head": 1749.25
   },
   {
     "state": "New South Wales",
@@ -130,7 +160,12 @@
     "ckg_avg": 494.87,
     "bid_rate": 0.8478,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "BUNGOWANNAH"
+    "top_delivery_town": "BUNGOWANNAH",
+    "state_total_lots": 6110,
+    "state_head_offered": 226365,
+    "state_head_sold": 181567,
+    "state_clearance_rate": 0.8021,
+    "state_avg_price_per_head": 1749.25
   },
   {
     "state": "New South Wales",
@@ -149,7 +184,12 @@
     "ckg_avg": 451.02,
     "bid_rate": 0.7954,
     "top_stock_category": "Steers",
-    "top_delivery_town": "CONDOBOLIN"
+    "top_delivery_town": "CONDOBOLIN",
+    "state_total_lots": 6110,
+    "state_head_offered": 226365,
+    "state_head_sold": 181567,
+    "state_clearance_rate": 0.8021,
+    "state_avg_price_per_head": 1749.25
   },
   {
     "state": "New South Wales",
@@ -158,17 +198,22 @@
     "breed": "Speckle Park/Speckle Park",
     "count_of_lots": 89,
     "head_offered": 1245,
-    "head_sold": 774,
-    "clearance_rate": 0.6217,
-    "avg_price_per_head": 1420.98,
+    "head_sold": 796,
+    "clearance_rate": 0.6394,
+    "avg_price_per_head": 1448.03,
     "min_price_per_head": 750,
     "max_price_per_head": 4000,
-    "avg_vor": 78.94,
-    "percent_over_reserve": 0.051,
-    "ckg_avg": 437.23,
-    "bid_rate": 0.8233,
+    "avg_vor": 75.21,
+    "percent_over_reserve": 0.049,
+    "ckg_avg": 438.94,
+    "bid_rate": 0.841,
     "top_stock_category": "Yearlings",
-    "top_delivery_town": "TAMWORTH"
+    "top_delivery_town": "TAMWORTH",
+    "state_total_lots": 6110,
+    "state_head_offered": 226365,
+    "state_head_sold": 181567,
+    "state_clearance_rate": 0.8021,
+    "state_avg_price_per_head": 1749.25
   },
   {
     "state": "Queensland",
@@ -177,17 +222,22 @@
     "breed": "Angus/Angus",
     "count_of_lots": 504,
     "head_offered": 23252,
-    "head_sold": 20952,
-    "clearance_rate": 0.9011,
-    "avg_price_per_head": 1686.8,
+    "head_sold": 21063,
+    "clearance_rate": 0.9059,
+    "avg_price_per_head": 1690.61,
     "min_price_per_head": 650,
     "max_price_per_head": 3240,
-    "avg_vor": 92.36,
-    "percent_over_reserve": 0.065,
-    "ckg_avg": 499.14,
+    "avg_vor": 91.93,
+    "percent_over_reserve": 0.064,
+    "ckg_avg": 499.19,
     "bid_rate": 0.9622,
     "top_stock_category": "Steers",
-    "top_delivery_town": "GOONDIWINDI"
+    "top_delivery_town": "GOONDIWINDI",
+    "state_total_lots": 2246,
+    "state_head_offered": 128864,
+    "state_head_sold": 115444,
+    "state_clearance_rate": 0.8959,
+    "state_avg_price_per_head": 1465.87
   },
   {
     "state": "Queensland",
@@ -196,17 +246,22 @@
     "breed": "Santa Gertrudis/Santa Gertrudis",
     "count_of_lots": 156,
     "head_offered": 11231,
-    "head_sold": 10710,
-    "clearance_rate": 0.9536,
-    "avg_price_per_head": 1547.61,
+    "head_sold": 10809,
+    "clearance_rate": 0.9624,
+    "avg_price_per_head": 1551.75,
     "min_price_per_head": 755,
     "max_price_per_head": 3220,
-    "avg_vor": 145.2,
-    "percent_over_reserve": 0.104,
-    "ckg_avg": 476.16,
+    "avg_vor": 142.84,
+    "percent_over_reserve": 0.102,
+    "ckg_avg": 475.9,
     "bid_rate": 0.9812,
     "top_stock_category": "Heifers",
-    "top_delivery_town": "ROLLESTON"
+    "top_delivery_town": "ROLLESTON",
+    "state_total_lots": 2246,
+    "state_head_offered": 128864,
+    "state_head_sold": 115444,
+    "state_clearance_rate": 0.8959,
+    "state_avg_price_per_head": 1465.87
   },
   {
     "state": "Queensland",
@@ -225,7 +280,12 @@
     "ckg_avg": 468.65,
     "bid_rate": 0.9945,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "LONGREACH"
+    "top_delivery_town": "LONGREACH",
+    "state_total_lots": 2246,
+    "state_head_offered": 128864,
+    "state_head_sold": 115444,
+    "state_clearance_rate": 0.8959,
+    "state_avg_price_per_head": 1465.87
   },
   {
     "state": "Queensland",
@@ -244,7 +304,12 @@
     "ckg_avg": 348.44,
     "bid_rate": 0.97,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "CLONCURRY"
+    "top_delivery_town": "CLONCURRY",
+    "state_total_lots": 2246,
+    "state_head_offered": 128864,
+    "state_head_sold": 115444,
+    "state_clearance_rate": 0.8959,
+    "state_avg_price_per_head": 1465.87
   },
   {
     "state": "Queensland",
@@ -263,7 +328,12 @@
     "ckg_avg": 476.15,
     "bid_rate": 0.9875,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "LONGREACH"
+    "top_delivery_town": "LONGREACH",
+    "state_total_lots": 2246,
+    "state_head_offered": 128864,
+    "state_head_sold": 115444,
+    "state_clearance_rate": 0.8959,
+    "state_avg_price_per_head": 1465.87
   },
   {
     "state": "Queensland",
@@ -282,7 +352,12 @@
     "ckg_avg": 442.6,
     "bid_rate": 0.9646,
     "top_stock_category": "Steers",
-    "top_delivery_town": "MITCHELL"
+    "top_delivery_town": "MITCHELL",
+    "state_total_lots": 2246,
+    "state_head_offered": 128864,
+    "state_head_sold": 115444,
+    "state_clearance_rate": 0.8959,
+    "state_avg_price_per_head": 1465.87
   },
   {
     "state": "Queensland",
@@ -301,7 +376,12 @@
     "ckg_avg": 468.62,
     "bid_rate": 0.976,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "QUILPIE"
+    "top_delivery_town": "QUILPIE",
+    "state_total_lots": 2246,
+    "state_head_offered": 128864,
+    "state_head_sold": 115444,
+    "state_clearance_rate": 0.8959,
+    "state_avg_price_per_head": 1465.87
   },
   {
     "state": "Queensland",
@@ -320,7 +400,12 @@
     "ckg_avg": 444.58,
     "bid_rate": 0.959,
     "top_stock_category": "Heifers",
-    "top_delivery_town": "WINTON"
+    "top_delivery_town": "WINTON",
+    "state_total_lots": 2246,
+    "state_head_offered": 128864,
+    "state_head_sold": 115444,
+    "state_clearance_rate": 0.8959,
+    "state_avg_price_per_head": 1465.87
   },
   {
     "state": "Queensland",
@@ -339,7 +424,12 @@
     "ckg_avg": 447.55,
     "bid_rate": 0.9199,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "HUGHENDEN"
+    "top_delivery_town": "HUGHENDEN",
+    "state_total_lots": 2246,
+    "state_head_offered": 128864,
+    "state_head_sold": 115444,
+    "state_clearance_rate": 0.8959,
+    "state_avg_price_per_head": 1465.87
   },
   {
     "state": "South Australia",
@@ -358,7 +448,12 @@
     "ckg_avg": 519.26,
     "bid_rate": 0.8834,
     "top_stock_category": "Heifers",
-    "top_delivery_town": "LUCINDALE"
+    "top_delivery_town": "LUCINDALE",
+    "state_total_lots": 648,
+    "state_head_offered": 28710,
+    "state_head_sold": 21308,
+    "state_clearance_rate": 0.7422,
+    "state_avg_price_per_head": 1654.74
   },
   {
     "state": "South Australia",
@@ -377,7 +472,12 @@
     "ckg_avg": 462.25,
     "bid_rate": 0.9558,
     "top_stock_category": "Steers",
-    "top_delivery_town": "KINGSTON SE"
+    "top_delivery_town": "KINGSTON SE",
+    "state_total_lots": 648,
+    "state_head_offered": 28710,
+    "state_head_sold": 21308,
+    "state_clearance_rate": 0.7422,
+    "state_avg_price_per_head": 1654.74
   },
   {
     "state": "South Australia",
@@ -396,7 +496,12 @@
     "ckg_avg": 468.96,
     "bid_rate": 0.6152,
     "top_stock_category": "Steers",
-    "top_delivery_town": "NARACOORTE"
+    "top_delivery_town": "NARACOORTE",
+    "state_total_lots": 648,
+    "state_head_offered": 28710,
+    "state_head_sold": 21308,
+    "state_clearance_rate": 0.7422,
+    "state_avg_price_per_head": 1654.74
   },
   {
     "state": "South Australia",
@@ -415,7 +520,12 @@
     "ckg_avg": 453.76,
     "bid_rate": 0.8505,
     "top_stock_category": "Heifers",
-    "top_delivery_town": "KEITH"
+    "top_delivery_town": "KEITH",
+    "state_total_lots": 648,
+    "state_head_offered": 28710,
+    "state_head_sold": 21308,
+    "state_clearance_rate": 0.7422,
+    "state_avg_price_per_head": 1654.74
   },
   {
     "state": "South Australia",
@@ -434,7 +544,12 @@
     "ckg_avg": 423.82,
     "bid_rate": 0.9173,
     "top_stock_category": "Heifers",
-    "top_delivery_town": "KINGSTON SE"
+    "top_delivery_town": "KINGSTON SE",
+    "state_total_lots": 648,
+    "state_head_offered": 28710,
+    "state_head_sold": 21308,
+    "state_clearance_rate": 0.7422,
+    "state_avg_price_per_head": 1654.74
   },
   {
     "state": "South Australia",
@@ -453,7 +568,12 @@
     "ckg_avg": 500.02,
     "bid_rate": 0.8505,
     "top_stock_category": "Heifers",
-    "top_delivery_town": "MOUNT BENSON"
+    "top_delivery_town": "MOUNT BENSON",
+    "state_total_lots": 648,
+    "state_head_offered": 28710,
+    "state_head_sold": 21308,
+    "state_clearance_rate": 0.7422,
+    "state_avg_price_per_head": 1654.74
   },
   {
     "state": "South Australia",
@@ -472,7 +592,12 @@
     "ckg_avg": 460.98,
     "bid_rate": 1,
     "top_stock_category": "Yearlings",
-    "top_delivery_town": "KINGSTON SE"
+    "top_delivery_town": "KINGSTON SE",
+    "state_total_lots": 648,
+    "state_head_offered": 28710,
+    "state_head_sold": 21308,
+    "state_clearance_rate": 0.7422,
+    "state_avg_price_per_head": 1654.74
   },
   {
     "state": "South Australia",
@@ -491,7 +616,12 @@
     "ckg_avg": 467.55,
     "bid_rate": 0.8806,
     "top_stock_category": "Yearlings",
-    "top_delivery_town": "TUNKALILLA"
+    "top_delivery_town": "TUNKALILLA",
+    "state_total_lots": 648,
+    "state_head_offered": 28710,
+    "state_head_sold": 21308,
+    "state_clearance_rate": 0.7422,
+    "state_avg_price_per_head": 1654.74
   },
   {
     "state": "South Australia",
@@ -510,7 +640,228 @@
     "ckg_avg": 419.88,
     "bid_rate": 1,
     "top_stock_category": "Yearlings",
-    "top_delivery_town": "TUNKALILLA"
+    "top_delivery_town": "TUNKALILLA",
+    "state_total_lots": 648,
+    "state_head_offered": 28710,
+    "state_head_sold": 21308,
+    "state_clearance_rate": 0.7422,
+    "state_avg_price_per_head": 1654.74
+  },
+  {
+    "state": "Tasmania",
+    "state_abbr": "TAS",
+    "position": 1,
+    "breed": "Angus/Angus",
+    "count_of_lots": 514,
+    "head_offered": 8350,
+    "head_sold": 7733,
+    "clearance_rate": 0.9261,
+    "avg_price_per_head": 1624.26,
+    "min_price_per_head": 760,
+    "max_price_per_head": 3850,
+    "avg_vor": 106,
+    "percent_over_reserve": 0.078,
+    "ckg_avg": 499.16,
+    "bid_rate": 0.9792,
+    "top_stock_category": "Yearlings",
+    "top_delivery_town": "BRIDPORT",
+    "state_total_lots": 1258,
+    "state_head_offered": 15548,
+    "state_head_sold": 14044,
+    "state_clearance_rate": 0.9033,
+    "state_avg_price_per_head": 1598.34
+  },
+  {
+    "state": "Tasmania",
+    "state_abbr": "TAS",
+    "position": 2,
+    "breed": "Hereford/Hereford",
+    "count_of_lots": 94,
+    "head_offered": 1044,
+    "head_sold": 842,
+    "clearance_rate": 0.8065,
+    "avg_price_per_head": 1827.86,
+    "min_price_per_head": 800,
+    "max_price_per_head": 3000,
+    "avg_vor": 107.86,
+    "percent_over_reserve": 0.065,
+    "ckg_avg": 490.48,
+    "bid_rate": 0.8333,
+    "top_stock_category": "Yearlings",
+    "top_delivery_town": "HAGLEY",
+    "state_total_lots": 1258,
+    "state_head_offered": 15548,
+    "state_head_sold": 14044,
+    "state_clearance_rate": 0.9033,
+    "state_avg_price_per_head": 1598.34
+  },
+  {
+    "state": "Tasmania",
+    "state_abbr": "TAS",
+    "position": 3,
+    "breed": "Angus/Friesian",
+    "count_of_lots": 59,
+    "head_offered": 1014,
+    "head_sold": 843,
+    "clearance_rate": 0.8314,
+    "avg_price_per_head": 1100.56,
+    "min_price_per_head": 720,
+    "max_price_per_head": 2300,
+    "avg_vor": 36.89,
+    "percent_over_reserve": 0.022,
+    "ckg_avg": 402.57,
+    "bid_rate": 0.8846,
+    "top_stock_category": "Weaners",
+    "top_delivery_town": "ELIZABETH TOWN",
+    "state_total_lots": 1258,
+    "state_head_offered": 15548,
+    "state_head_sold": 14044,
+    "state_clearance_rate": 0.9033,
+    "state_avg_price_per_head": 1598.34
+  },
+  {
+    "state": "Tasmania",
+    "state_abbr": "TAS",
+    "position": 4,
+    "breed": "Shorthorn/Shorthorn",
+    "count_of_lots": 63,
+    "head_offered": 573,
+    "head_sold": 547,
+    "clearance_rate": 0.9546,
+    "avg_price_per_head": 1651.59,
+    "min_price_per_head": 860,
+    "max_price_per_head": 2340,
+    "avg_vor": 87.59,
+    "percent_over_reserve": 0.064,
+    "ckg_avg": 496.5,
+    "bid_rate": 0.9651,
+    "top_stock_category": "Weaners",
+    "top_delivery_town": "BLACKWOOD CREEK",
+    "state_total_lots": 1258,
+    "state_head_offered": 15548,
+    "state_head_sold": 14044,
+    "state_clearance_rate": 0.9033,
+    "state_avg_price_per_head": 1598.34
+  },
+  {
+    "state": "Tasmania",
+    "state_abbr": "TAS",
+    "position": 5,
+    "breed": "Murray Grey/Murray Grey",
+    "count_of_lots": 55,
+    "head_offered": 409,
+    "head_sold": 392,
+    "clearance_rate": 0.9584,
+    "avg_price_per_head": 1604.52,
+    "min_price_per_head": 700,
+    "max_price_per_head": 2540,
+    "avg_vor": 101.37,
+    "percent_over_reserve": 0.068,
+    "ckg_avg": 484.1,
+    "bid_rate": 0.9927,
+    "top_stock_category": "Yearlings",
+    "top_delivery_town": "EAST RIDGLEY",
+    "state_total_lots": 1258,
+    "state_head_offered": 15548,
+    "state_head_sold": 14044,
+    "state_clearance_rate": 0.9033,
+    "state_avg_price_per_head": 1598.34
+  },
+  {
+    "state": "Tasmania",
+    "state_abbr": "TAS",
+    "position": 6,
+    "breed": "Angus/Angus Cross",
+    "count_of_lots": 49,
+    "head_offered": 380,
+    "head_sold": 316,
+    "clearance_rate": 0.8316,
+    "avg_price_per_head": 1640.11,
+    "min_price_per_head": 980,
+    "max_price_per_head": 2240,
+    "avg_vor": 63.75,
+    "percent_over_reserve": 0.05,
+    "ckg_avg": 448.44,
+    "bid_rate": 0.8395,
+    "top_stock_category": "Yearlings",
+    "top_delivery_town": "UPPER STOWPORT",
+    "state_total_lots": 1258,
+    "state_head_offered": 15548,
+    "state_head_sold": 14044,
+    "state_clearance_rate": 0.9033,
+    "state_avg_price_per_head": 1598.34
+  },
+  {
+    "state": "Tasmania",
+    "state_abbr": "TAS",
+    "position": 7,
+    "breed": "Hereford/Angus",
+    "count_of_lots": 22,
+    "head_offered": 302,
+    "head_sold": 278,
+    "clearance_rate": 0.9205,
+    "avg_price_per_head": 1658.31,
+    "min_price_per_head": 880,
+    "max_price_per_head": 2400,
+    "avg_vor": 168.42,
+    "percent_over_reserve": 0.115,
+    "ckg_avg": 497.51,
+    "bid_rate": 0.9205,
+    "top_stock_category": "Yearlings",
+    "top_delivery_town": "GRASSY",
+    "state_total_lots": 1258,
+    "state_head_offered": 15548,
+    "state_head_sold": 14044,
+    "state_clearance_rate": 0.9033,
+    "state_avg_price_per_head": 1598.34
+  },
+  {
+    "state": "Tasmania",
+    "state_abbr": "TAS",
+    "position": 8,
+    "breed": "Red Angus/Red Angus",
+    "count_of_lots": 35,
+    "head_offered": 297,
+    "head_sold": 291,
+    "clearance_rate": 0.9798,
+    "avg_price_per_head": 1739.66,
+    "min_price_per_head": 830,
+    "max_price_per_head": 3000,
+    "avg_vor": 63.45,
+    "percent_over_reserve": 0.039,
+    "ckg_avg": 497.83,
+    "bid_rate": 0.9798,
+    "top_stock_category": "Yearlings",
+    "top_delivery_town": "PIPERS RIVER",
+    "state_total_lots": 1258,
+    "state_head_offered": 15548,
+    "state_head_sold": 14044,
+    "state_clearance_rate": 0.9033,
+    "state_avg_price_per_head": 1598.34
+  },
+  {
+    "state": "Tasmania",
+    "state_abbr": "TAS",
+    "position": 9,
+    "breed": "Speckle Park/Speckle Park",
+    "count_of_lots": 32,
+    "head_offered": 270,
+    "head_sold": 235,
+    "clearance_rate": 0.8704,
+    "avg_price_per_head": 1361.7,
+    "min_price_per_head": 550,
+    "max_price_per_head": 2320,
+    "avg_vor": 111.3,
+    "percent_over_reserve": 0.099,
+    "ckg_avg": 469.27,
+    "bid_rate": 0.9444,
+    "top_stock_category": "Yearlings",
+    "top_delivery_town": "MELROSE",
+    "state_total_lots": 1258,
+    "state_head_offered": 15548,
+    "state_head_sold": 14044,
+    "state_clearance_rate": 0.9033,
+    "state_avg_price_per_head": 1598.34
   },
   {
     "state": "Victoria",
@@ -519,17 +870,22 @@
     "breed": "Angus/Angus",
     "count_of_lots": 1115,
     "head_offered": 34970,
-    "head_sold": 25569,
-    "clearance_rate": 0.7312,
-    "avg_price_per_head": 2034.61,
+    "head_sold": 25688,
+    "clearance_rate": 0.7346,
+    "avg_price_per_head": 2034.12,
     "min_price_per_head": 615,
     "max_price_per_head": 5000,
-    "avg_vor": 162.31,
+    "avg_vor": 160.5,
     "percent_over_reserve": 0.059,
-    "ckg_avg": 525.53,
+    "ckg_avg": 525.18,
     "bid_rate": 0.8518,
     "top_stock_category": "Heifers",
-    "top_delivery_town": "MORTLAKE"
+    "top_delivery_town": "MORTLAKE",
+    "state_total_lots": 1771,
+    "state_head_offered": 45573,
+    "state_head_sold": 32573,
+    "state_clearance_rate": 0.7147,
+    "state_avg_price_per_head": 1950.54
   },
   {
     "state": "Victoria",
@@ -548,7 +904,12 @@
     "ckg_avg": 487.45,
     "bid_rate": 0.7376,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "MERTON"
+    "top_delivery_town": "MERTON",
+    "state_total_lots": 1771,
+    "state_head_offered": 45573,
+    "state_head_sold": 32573,
+    "state_clearance_rate": 0.7147,
+    "state_avg_price_per_head": 1950.54
   },
   {
     "state": "Victoria",
@@ -567,7 +928,12 @@
     "ckg_avg": 487.72,
     "bid_rate": 0.8558,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "STOCKYARD HILL"
+    "top_delivery_town": "STOCKYARD HILL",
+    "state_total_lots": 1771,
+    "state_head_offered": 45573,
+    "state_head_sold": 32573,
+    "state_clearance_rate": 0.7147,
+    "state_avg_price_per_head": 1950.54
   },
   {
     "state": "Victoria",
@@ -586,7 +952,12 @@
     "ckg_avg": 515.15,
     "bid_rate": 0.8368,
     "top_stock_category": "Steers",
-    "top_delivery_town": "HEYWOOD"
+    "top_delivery_town": "HEYWOOD",
+    "state_total_lots": 1771,
+    "state_head_offered": 45573,
+    "state_head_sold": 32573,
+    "state_clearance_rate": 0.7147,
+    "state_avg_price_per_head": 1950.54
   },
   {
     "state": "Victoria",
@@ -605,7 +976,12 @@
     "ckg_avg": 498.62,
     "bid_rate": 0.8018,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "FLYNN"
+    "top_delivery_town": "FLYNN",
+    "state_total_lots": 1771,
+    "state_head_offered": 45573,
+    "state_head_sold": 32573,
+    "state_clearance_rate": 0.7147,
+    "state_avg_price_per_head": 1950.54
   },
   {
     "state": "Victoria",
@@ -624,7 +1000,12 @@
     "ckg_avg": 490.44,
     "bid_rate": 0.9041,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "DHURRINGILE"
+    "top_delivery_town": "DHURRINGILE",
+    "state_total_lots": 1771,
+    "state_head_offered": 45573,
+    "state_head_sold": 32573,
+    "state_clearance_rate": 0.7147,
+    "state_avg_price_per_head": 1950.54
   },
   {
     "state": "Victoria",
@@ -643,7 +1024,12 @@
     "ckg_avg": 466.47,
     "bid_rate": 1,
     "top_stock_category": "Heifers",
-    "top_delivery_town": "STOCKYARD HILL"
+    "top_delivery_town": "STOCKYARD HILL",
+    "state_total_lots": 1771,
+    "state_head_offered": 45573,
+    "state_head_sold": 32573,
+    "state_clearance_rate": 0.7147,
+    "state_avg_price_per_head": 1950.54
   },
   {
     "state": "Victoria",
@@ -662,7 +1048,12 @@
     "ckg_avg": 468.3,
     "bid_rate": 0.8839,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "CASTERTON"
+    "top_delivery_town": "CASTERTON",
+    "state_total_lots": 1771,
+    "state_head_offered": 45573,
+    "state_head_sold": 32573,
+    "state_clearance_rate": 0.7147,
+    "state_avg_price_per_head": 1950.54
   },
   {
     "state": "Victoria",
@@ -681,7 +1072,12 @@
     "ckg_avg": 470.33,
     "bid_rate": 0.6912,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "BADDAGINNIE"
+    "top_delivery_town": "BADDAGINNIE",
+    "state_total_lots": 1771,
+    "state_head_offered": 45573,
+    "state_head_sold": 32573,
+    "state_clearance_rate": 0.7147,
+    "state_avg_price_per_head": 1950.54
   },
   {
     "state": "Western Australia",
@@ -690,17 +1086,22 @@
     "breed": "Angus/Angus",
     "count_of_lots": 245,
     "head_offered": 5893,
-    "head_sold": 5654,
-    "clearance_rate": 0.9594,
-    "avg_price_per_head": 1927.11,
+    "head_sold": 5677,
+    "clearance_rate": 0.9633,
+    "avg_price_per_head": 1923.78,
     "min_price_per_head": 885,
     "max_price_per_head": 3275,
-    "avg_vor": 138.36,
+    "avg_vor": 136.42,
     "percent_over_reserve": 0.078,
-    "ckg_avg": 439.32,
-    "bid_rate": 0.9618,
+    "ckg_avg": 439.18,
+    "bid_rate": 0.9657,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "NORTHCLIFFE"
+    "top_delivery_town": "NORTHCLIFFE",
+    "state_total_lots": 280,
+    "state_head_offered": 6738,
+    "state_head_sold": 6268,
+    "state_clearance_rate": 0.9302,
+    "state_avg_price_per_head": 1892
   },
   {
     "state": "Western Australia",
@@ -719,7 +1120,12 @@
     "ckg_avg": 460.06,
     "bid_rate": 1,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "BOYUP BROOK"
+    "top_delivery_town": "BOYUP BROOK",
+    "state_total_lots": 280,
+    "state_head_offered": 6738,
+    "state_head_sold": 6268,
+    "state_clearance_rate": 0.9302,
+    "state_avg_price_per_head": 1892
   },
   {
     "state": "Western Australia",
@@ -738,7 +1144,12 @@
     "ckg_avg": "NULL",
     "bid_rate": "NULL",
     "top_stock_category": "Cows",
-    "top_delivery_town": "NULL"
+    "top_delivery_town": "NULL",
+    "state_total_lots": 280,
+    "state_head_offered": 6738,
+    "state_head_sold": 6268,
+    "state_clearance_rate": 0.9302,
+    "state_avg_price_per_head": 1892
   },
   {
     "state": "Western Australia",
@@ -757,7 +1168,12 @@
     "ckg_avg": "NULL",
     "bid_rate": "NULL",
     "top_stock_category": "Yearlings",
-    "top_delivery_town": "NULL"
+    "top_delivery_town": "NULL",
+    "state_total_lots": 280,
+    "state_head_offered": 6738,
+    "state_head_sold": 6268,
+    "state_clearance_rate": 0.9302,
+    "state_avg_price_per_head": 1892
   },
   {
     "state": "Western Australia",
@@ -776,7 +1192,12 @@
     "ckg_avg": 302.32,
     "bid_rate": 1,
     "top_stock_category": "Yearlings",
-    "top_delivery_town": "HARVEY"
+    "top_delivery_town": "HARVEY",
+    "state_total_lots": 280,
+    "state_head_offered": 6738,
+    "state_head_sold": 6268,
+    "state_clearance_rate": 0.9302,
+    "state_avg_price_per_head": 1892
   },
   {
     "state": "Western Australia",
@@ -795,7 +1216,12 @@
     "ckg_avg": 405.59,
     "bid_rate": 1,
     "top_stock_category": "Weaners",
-    "top_delivery_town": "BOYUP BROOK"
+    "top_delivery_town": "BOYUP BROOK",
+    "state_total_lots": 280,
+    "state_head_offered": 6738,
+    "state_head_sold": 6268,
+    "state_clearance_rate": 0.9302,
+    "state_avg_price_per_head": 1892
   },
   {
     "state": "Western Australia",
@@ -814,7 +1240,12 @@
     "ckg_avg": 318,
     "bid_rate": 1,
     "top_stock_category": "Cows",
-    "top_delivery_town": "NORTHCLIFFE"
+    "top_delivery_town": "NORTHCLIFFE",
+    "state_total_lots": 280,
+    "state_head_offered": 6738,
+    "state_head_sold": 6268,
+    "state_clearance_rate": 0.9302,
+    "state_avg_price_per_head": 1892
   },
   {
     "state": "Western Australia",
@@ -833,7 +1264,12 @@
     "ckg_avg": 375.71,
     "bid_rate": 1,
     "top_stock_category": "Heifers",
-    "top_delivery_town": "BENGER"
+    "top_delivery_town": "BENGER",
+    "state_total_lots": 280,
+    "state_head_offered": 6738,
+    "state_head_sold": 6268,
+    "state_clearance_rate": 0.9302,
+    "state_avg_price_per_head": 1892
   },
   {
     "state": "Western Australia",
@@ -852,6 +1288,11 @@
     "ckg_avg": 430,
     "bid_rate": 1,
     "top_stock_category": "Yearlings",
-    "top_delivery_town": "WALSALL"
+    "top_delivery_town": "WALSALL",
+    "state_total_lots": 280,
+    "state_head_offered": 6738,
+    "state_head_sold": 6268,
+    "state_clearance_rate": 0.9302,
+    "state_avg_price_per_head": 1892
   }
 ]
